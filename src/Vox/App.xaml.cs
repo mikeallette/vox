@@ -167,7 +167,7 @@ public partial class App : System.Windows.Application
         if (e.Args.Length >= 3 && e.Args[0] == "--rule-tests") { try { Trainer.RuleTests(e.Args); } catch (Exception ex) { File.WriteAllText(e.Args[1] + ".error.txt", ex.ToString()); } Shutdown(); return; }
         if (e.Args.Length >= 3 && e.Args[0] == "--analyze") { try { Trainer.Analyze(e.Args); } catch (Exception ex) { File.WriteAllText(Path.Combine(e.Args[2], "analyze-error.txt"), ex.ToString()); } Shutdown(); return; }
         if (e.Args.Length >= 2 && e.Args[0] == "--learn") { try { Trainer.Learn(e.Args[1], e.Args.Length > 2 ? e.Args[2] : null); } catch (Exception ex) { File.WriteAllText(Path.Combine(e.Args[1], "learn-error.txt"), ex.ToString()); } Shutdown(); return; }
-        if (e.Args.Length >= 2 && e.Args[0] == "--make-icon") { IconMaker.Write(e.Args[1]); Shutdown(); return; }
+        if (e.Args.Length >= 2 && e.Args[0] == "--make-icon") { IconMaker.Write(e.Args[1]); if (e.Args.Length > 2) IconMaker.Preview(e.Args[2]); Shutdown(); return; }
         if (e.Args.Length >= 2 && e.Args[0] == "--hotkey-test") { HotkeyTest.Run(e.Args); Shutdown(); return; }
         if (e.Args.Length >= 3 && e.Args[0] == "--loopback-test") { await MeetingTest.LoopbackAsync(e.Args); Shutdown(); return; }
         if (e.Args.Length >= 3 && e.Args[0] == "--spk-probe") { MeetingTest.Probe(e.Args); Shutdown(); return; }
@@ -329,33 +329,79 @@ public partial class App : System.Windows.Application
 
 internal static class IconMaker
 {
-    /// <summary>Draws the Vox mark: teal rounded square with five waveform bars.</summary>
+    static readonly System.Drawing.Color Ink = System.Drawing.Color.FromArgb(0x1F, 0x3A, 0x5F), PaperC = System.Drawing.Color.FromArgb(0xF7, 0xF4, 0xEB),
+        Grid = System.Drawing.Color.FromArgb(0x22, 0x1F, 0x3A, 0x5F), Margin = System.Drawing.Color.FromArgb(0xB4, 0x43, 0x2F);
+
+    // the talk button's ink line (same shape as the main window), in a 56 x 34 box; small sizes use fewer, bolder strokes
+    static readonly PointF[] WaveFull = { new(2, 17), new(8, 14), new(12, 22), new(17, 7), new(22, 27), new(27, 10), new(32, 21), new(37, 4), new(42, 28), new(47, 13), new(52, 18), new(54, 17) };
+    static readonly PointF[] WaveSmall = { new(2, 17), new(12, 10), new(20, 26), new(28, 4), new(36, 30), new(44, 11), new(54, 17) };
+
+    /// <summary>
+    /// Draws the Vox mark in the notebook look: a sheet of graph paper with an ink rim and a red margin line, and the ink
+    /// talk button with its waveform in the middle. Below 40 px the grid and margin are left out so it stays crisp.
+    /// </summary>
     public static Bitmap Draw(int size)
     {
         var bmp = new Bitmap(size, size);
         using var g = Graphics.FromImage(bmp);
         g.SmoothingMode = SmoothingMode.AntiAlias;
+        g.PixelOffsetMode = PixelOffsetMode.HighQuality;
         g.Clear(System.Drawing.Color.Transparent);
-        float r = size * 0.22f;
-        using var path = new GraphicsPath();
-        path.AddArc(0, 0, r * 2, r * 2, 180, 90); path.AddArc(size - r * 2, 0, r * 2, r * 2, 270, 90);
-        path.AddArc(size - r * 2, size - r * 2, r * 2, r * 2, 0, 90); path.AddArc(0, size - r * 2, r * 2, r * 2, 90, 90);
-        path.CloseFigure();
-        using (var br = new LinearGradientBrush(new System.Drawing.Rectangle(0, 0, size, size), System.Drawing.Color.FromArgb(0x14, 0x9A, 0xA6), System.Drawing.Color.FromArgb(0x0A, 0x5C, 0x66), 60f))
-            g.FillPath(br, path);
-        float[] hs = { 0.30f, 0.55f, 0.80f, 0.55f, 0.30f };
-        float bw = size * 0.085f, gap = size * 0.065f, total = 5 * bw + 4 * gap, x = (size - total) / 2;
-        using var wb = new SolidBrush(System.Drawing.Color.White);
-        for (int i = 0; i < 5; i++)
+        bool small = size < 40;
+
+        float rim = Math.Max(1f, size * (small ? 0.045f : 0.034f)), inset = rim / 2 + (small ? 0.5f : size * 0.02f);
+        var tile = new RectangleF(inset, inset, size - 2 * inset, size - 2 * inset);
+        using var tilePath = Rounded(tile, size * 0.2f);
+        using (var pb = new SolidBrush(PaperC)) g.FillPath(pb, tilePath);
+        if (!small)
         {
-            float h = size * hs[i];
-            var rect = new RectangleF(x + i * (bw + gap), (size - h) / 2, bw, h);
-            using var bp = new GraphicsPath();
-            float rr = bw / 2;
-            bp.AddArc(rect.X, rect.Y, bw, bw, 180, 180); bp.AddArc(rect.X, rect.Bottom - bw, bw, bw, 0, 180); bp.CloseFigure();
-            g.FillPath(wb, bp);
+            g.SetClip(tilePath);
+            float step = size / 8f;
+            using var gp = new Pen(Grid, Math.Max(1f, size / 128f));
+            for (float v = step; v < size; v += step) { g.DrawLine(gp, v, 0, v, size); g.DrawLine(gp, 0, v, size, v); }
+            using var mp = new Pen(Margin, Math.Max(1.5f, size * 0.022f));
+            g.DrawLine(mp, size * 0.2f, 0, size * 0.2f, size);
+            g.ResetClip();
         }
+        using (var rp = new Pen(Ink, rim)) g.DrawPath(rp, tilePath);
+
+        // the ink talk button
+        float d = size * (small ? 0.68f : 0.58f), cx = size / 2f, cy = size / 2f;
+        using (var ib = new SolidBrush(Ink)) g.FillEllipse(ib, cx - d / 2, cy - d / 2, d, d);
+
+        var src = small ? WaveSmall : WaveFull;
+        float w = d * 0.66f, h = w * 34f / 56f;
+        var pts = src.Select(p => new PointF(cx - w / 2 + p.X / 56f * w, cy - h / 2 + p.Y / 34f * h)).ToArray();
+        using var wp = new Pen(PaperC, Math.Max(1.4f, size * (small ? 0.075f : 0.045f))) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+        g.DrawLines(wp, pts);
         return bmp;
+    }
+
+    static GraphicsPath Rounded(RectangleF r, float radius)
+    {
+        float d = radius * 2;
+        var p = new GraphicsPath();
+        p.AddArc(r.X, r.Y, d, d, 180, 90); p.AddArc(r.Right - d, r.Y, d, d, 270, 90);
+        p.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90); p.AddArc(r.X, r.Bottom - d, d, d, 90, 90);
+        p.CloseFigure();
+        return p;
+    }
+
+    /// <summary>A strip of the mark at every icon size, on paper and on a dark taskbar color, for checking by eye.</summary>
+    public static void Preview(string pngPath)
+    {
+        var sizes = new[] { 16, 24, 32, 48, 64, 128, 256 };
+        int pad = 16, W = sizes.Sum() + pad * (sizes.Length + 1);
+        using var sheet = new Bitmap(W, (256 + pad * 2) * 2);
+        using var g = Graphics.FromImage(sheet);
+        g.Clear(PaperC);
+        using (var dark = new SolidBrush(System.Drawing.Color.FromArgb(0x20, 0x20, 0x20))) g.FillRectangle(dark, 0, 256 + pad * 2, W, 256 + pad * 2);
+        for (int row = 0; row < 2; row++)
+        {
+            int x = pad;
+            foreach (var s in sizes) { using var b = Draw(s); g.DrawImage(b, x, row * (256 + pad * 2) + pad + 256 - s); x += s + pad; }
+        }
+        sheet.Save(pngPath, System.Drawing.Imaging.ImageFormat.Png);
     }
 
     public static Icon Make(int size) { using var b = Draw(size); return Icon.FromHandle(b.GetHicon()); }

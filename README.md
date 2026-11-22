@@ -32,7 +32,7 @@
 ## Download
 
 1. Open the [**latest release**](https://github.com/mikeallette/vox/releases/latest).
-2. Download **`Vox-Setup-1.0.1.exe`** and run it. It installs just for you, with no administrator rights needed.
+2. Download **`Vox-Setup-1.1.0.exe`** and run it. It installs just for you, with no administrator rights needed. Already have Vox? Run the new setup and it updates in place, keeping your settings, dictionary and history.
 3. Start Vox from the Start menu, pick a folder for your data, and hold **Ctrl + Win** to talk.
 
 | File | What it is |
@@ -63,6 +63,7 @@ about 1.5 GB of disk space, and roughly 2 GB of free memory. The .NET runtime is
 | Cancel | **Esc** |
 | Paste the last dictation again | **Alt + Shift + Z** |
 | Copy the last dictation | **Alt + Shift + X** |
+| Re-hear the last dictation in Accurate mode | **Alt + Shift + R** |
 
 Every shortcut can be changed in **Settings > Shortcuts**: click *Change...*, press the keys you want, and let go.
 Any mix of Ctrl, Alt, Shift and Win works, with up to two other keys. A small **Vox bar** at the bottom of the
@@ -84,19 +85,27 @@ Vox transcribes finished phrases while you're still talking, so there's little l
 **Clean text, not a raw transcript**<br>
 Filler sounds (um, uh), stutters and false starts are removed. Say "new line" or "new paragraph" to format as you go.
 
+**Voice commands**<br>
+"scratch that" removes the last dictation, "... press enter" sends it, "note to self ..." saves a note, and
+"calculate ..." types the answer.
+
 </td>
 <td width="50%" valign="top">
 
 **Written like an engineer would**<br>
 "forty eight volts" becomes **48 V**, "ten K pull up" becomes **10 kΩ pull up**, "eighty five degrees C"
-becomes **85°C**, and "eight ten p m" becomes **8:10 p.m.** You can turn this off.
+becomes **85°C**, and "eight ten p m" becomes **8:10 p.m.** Part numbers and designators (TPS54360, R12, Q3)
+stay intact. You can turn this off.
 
 **Your words, spelled your way**<br>
-The **Dictionary** teaches Vox names, part numbers and jargon, including words it keeps mishearing.
+The **Dictionary** teaches Vox names, part numbers and jargon, including words it keeps mishearing. Fix a
+dictation in History and Vox offers the corrected words as dictionary entries.
 **Snippets** type a saved block of text when you say a short phrase.
 
 **History you control**<br>
-Every dictation can be saved locally with copy and delete, or not saved at all.
+Every dictation can be saved locally with fix, copy and delete, or not saved at all. **Private mode** (tray or
+Settings) saves nothing until you turn it off. **Move to another PC** exports your dictionary, snippets and settings
+in one file.
 
 </td>
 </tr>
@@ -134,7 +143,7 @@ When you stop, it saves a timestamped Markdown transcript:
 ```
 
 Other voices are told apart and labeled Speaker 1, Speaker 2..., all on your PC, using the speaker models
-included in the installer. **Rename speakers...** replaces the labels with real names. Please ask people
+included in the installer. **Rename speakers...** replaces the labels with real names, and a "Possible action items" checklist sits at the top of each transcript. Please ask people
 before you record them.
 
 ## Privacy
