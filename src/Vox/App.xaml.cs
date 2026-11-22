@@ -172,7 +172,7 @@ public partial class App : System.Windows.Application
         if (e.Args.Length >= 3 && e.Args[0] == "--loopback-test") { await MeetingTest.LoopbackAsync(e.Args); Shutdown(); return; }
         if (e.Args.Length >= 3 && e.Args[0] == "--spk-probe") { MeetingTest.Probe(e.Args); Shutdown(); return; }
         if (e.Args.Length >= 4 && e.Args[0] == "--meeting-test") { await MeetingTest.RunAsync(e.Args); Shutdown(); return; }
-        if (e.Args.Length >= 1 && e.Args[0] == "--demo-bar") { await DemoVoxBarAsync(); Shutdown(); return; }
+        if (e.Args.Length >= 1 && e.Args[0] == "--demo-bar") { await DemoVoxBarAsync(e.Args.Length > 1 ? e.Args[1] : null); Shutdown(); return; }
 
         // single instance: a second launch just brings up the first one
         // a test copy with its own settings folder (VOX_SETTINGS_DIR) may run beside the real Vox
@@ -247,18 +247,29 @@ public partial class App : System.Windows.Application
     }
 
     /// <summary>Developer aid: cycles the Vox bar through its states with synthetic levels (no mic, no model).</summary>
-    static async Task DemoVoxBarAsync()
+    /// <summary>Developer aid: Vox.exe --demo-bar [pngFolder] cycles the Vox bar through every state; with a folder it also saves a picture of each.</summary>
+    static async Task DemoVoxBarAsync(string? snapDir = null)
     {
         var bar = new VoxBar { AlwaysVisible = true };
-        bar.Show(); bar.SetState(VoxState.Idle, "");
-        await Task.Delay(4000);
-        bar.SetState(VoxState.Listening, "Listening");
         var rnd = new Random(1);
-        for (int i = 0; i < 240; i++) { bar.PushLevel((float)(0.002 + 0.03 * Math.Abs(Math.Sin(i / 7.0)) * rnd.NextDouble())); await Task.Delay(25); }
-        bar.SetState(VoxState.Processing, "Transcribing"); await Task.Delay(4000);
-        bar.SetState(VoxState.Done, "1.2s"); await Task.Delay(3000);
-        bar.SetState(VoxState.Notice, "No sound heard. Check your microphone."); await Task.Delay(3000);
-        bar.SetState(VoxState.Idle, ""); await Task.Delay(1500);
+        async Task Talk(int frames) { for (int i = 0; i < frames; i++) { bar.PushLevel((float)(0.002 + 0.03 * Math.Abs(Math.Sin(i / 7.0)) * rnd.NextDouble())); await Task.Delay(25); } }
+        void Snap(string name)
+        {
+            if (snapDir == null || bar.Content is not FrameworkElement root) return;
+            Directory.CreateDirectory(snapDir);
+            var bmp = new System.Windows.Media.Imaging.RenderTargetBitmap((int)(root.ActualWidth * 2), (int)(root.ActualHeight * 2), 192, 192, System.Windows.Media.PixelFormats.Pbgra32);
+            bmp.Render(root);
+            var enc = new System.Windows.Media.Imaging.PngBitmapEncoder(); enc.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bmp));
+            using var f = File.Create(Path.Combine(snapDir, name + ".png")); enc.Save(f);
+        }
+        bar.Show(); bar.SetState(VoxState.Idle, ""); await Task.Delay(1500); Snap("1-resting");
+        bar.SetState(VoxState.Listening, "Listening"); await Talk(100); Snap("2-listening");
+        bar.SetState(VoxState.Listening, "Hands-free"); await Talk(100); Snap("3-hands-free");
+        bar.SetState(VoxState.Listening, DictationController.QuietLabel); await Talk(80); Snap("4-quiet-mic");
+        bar.SetState(VoxState.Processing, "Transcribing"); await Task.Delay(1500); Snap("5-writing");
+        bar.SetState(VoxState.Done, "1.2s"); await Task.Delay(1500); Snap("6-written");
+        bar.SetState(VoxState.Notice, "No sound heard. Check your microphone."); await Task.Delay(1500); Snap("7-notice");
+        bar.SetState(VoxState.Idle, ""); await Task.Delay(1000);
         bar.Close();
     }
 

@@ -3,18 +3,36 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" Topmost="True" ShowActivated="False" Focusable="False"
-        ResizeMode="NoResize" Width="360" Height="76" IsHitTestVisible="False">
+        ResizeMode="NoResize" Width="460" Height="84" IsHitTestVisible="False" UseLayoutRounding="True">
+    <!-- The Vox bar: a white pill with an ink rim, like a note card. States are set in VoxBar.SetState. -->
     <Grid>
-        <Border x:Name="Pill" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12"
-                Width="48" Height="10" CornerRadius="19" Background="#F0171A20" BorderBrush="#40FFFFFF" BorderThickness="1">
-            <Border.Effect><DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.35"/></Border.Effect>
-            <Grid x:Name="Inner" Opacity="0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="14,0">
-                    <Ellipse x:Name="Dot" Width="9" Height="9" Fill="#FF5A4F" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                    <Canvas x:Name="Wave" Width="112" Height="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <TextBlock x:Name="Label" Foreground="#F2F3F5" FontSize="13" FontFamily="Segoe UI Semibold" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Grid>
-        </Border>
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12">
+            <!-- soft lift plus a hard ink offset, matching the cards in the main window -->
+            <Border x:Name="PillShadow" Width="{Binding ActualWidth, ElementName=Pill}" Height="{Binding ActualHeight, ElementName=Pill}"
+                    CornerRadius="{Binding CornerRadius, ElementName=Pill}" Background="#401F3A5F" Margin="3,3,-3,-3">
+                <Border.Effect><BlurEffect Radius="6"/></Border.Effect>
+            </Border>
+            <Border x:Name="Pill" Width="64" Height="12" CornerRadius="6" Background="White" BorderBrush="#1F3A5F" BorderThickness="1.5">
+                <Grid x:Name="Inner" Opacity="0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7,0,18,0">
+                        <Grid x:Name="Badge" Width="26" Height="26" Margin="0,0,10,0">
+                            <Ellipse x:Name="BadgeCircle" Fill="#1F3A5F"/>
+                            <Ellipse x:Name="BadgeDot" Width="8" Height="8" Fill="#F2C14E"/>
+                            <Path x:Name="BadgeIcon" Stretch="Uniform" Width="12" Height="12" Stroke="White" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed"/>
+                            <TextBlock x:Name="BadgeBang" Text="!" Foreground="White" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                        </Grid>
+                        <Canvas x:Name="Wave" Width="110" Height="24" VerticalAlignment="Center" Margin="0,0,10,0" ClipToBounds="True">
+                            <Polyline x:Name="WaveLine" Stroke="#1F3A5F" StrokeThickness="2" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        </Canvas>
+                        <StackPanel x:Name="Dots" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="Collapsed">
+                            <Ellipse x:Name="Dot1" Width="6" Height="6" Fill="#1F3A5F" Margin="0,0,5,0"/>
+                            <Ellipse x:Name="Dot2" Width="6" Height="6" Fill="#1F3A5F" Margin="0,0,5,0"/>
+                            <Ellipse x:Name="Dot3" Width="6" Height="6" Fill="#1F3A5F"/>
+                        </StackPanel>
+                        <TextBlock x:Name="Label" Foreground="#1F3A5F" FontSize="15.5" FontStyle="Italic" FontFamily="{StaticResource Serif}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

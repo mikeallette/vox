@@ -27,6 +27,9 @@ VersionInfoDescription=Vox offline voice dictation setup
 DefaultDirName={localappdata}\Programs\Vox
 DefaultGroupName=Vox
 DisableProgramGroupPage=yes
+DisableWelcomePage=no
+; an update reuses the folder of the version already installed (same AppId), so it simply overwrites it
+UsePreviousAppDir=yes
 DisableDirPage=auto
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
@@ -71,6 +74,34 @@ Filename: "{app}\Vox.exe"; Description: "Start Vox now"; Flags: nowait postinsta
 ; files Vox may create next to itself (imported models live in the data folder, not here)
 Type: filesandordirs; Name: "{app}\models"
 Type: dirifempty; Name: "{app}"
+
+[Code]
+const
+  UninstKey = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{6E0B9B52-3C0E-4F5B-9D7A-2B5F4C9A7F3A}_is1';
+
+{ The version already on this PC, if any (per-user install first, then a machine-wide one). }
+function InstalledVersion(var Version: String): Boolean;
+begin
+  Result := RegQueryStringValue(HKCU, UninstKey, 'DisplayVersion', Version) or
+            RegQueryStringValue(HKLM, UninstKey, 'DisplayVersion', Version);
+end;
+
+procedure InitializeWizard;
+var
+  Old: String;
+begin
+  if InstalledVersion(Old) then
+  begin
+    if Old = '{#AppVersion}' then
+      WizardForm.WelcomeLabel2.Caption :=
+        'Vox ' + Old + ' is already installed on this PC. Setup will reinstall it in the same folder, which repairs any missing files.' + #13#10#13#10 +
+        'Your settings, dictionary, snippets, history and meeting transcripts are kept.'
+    else
+      WizardForm.WelcomeLabel2.Caption :=
+        'Vox ' + Old + ' is installed on this PC. Setup will update it to Vox {#AppVersion}, replacing the old version in the same folder.' + #13#10#13#10 +
+        'Your settings, dictionary, snippets, history and meeting transcripts are kept. If Vox is running, Setup asks you to close it first.';
+  end;
+end;
 
 [Messages]
 WelcomeLabel2=This installs Vox [ver], private voice dictation that runs entirely on this PC.%n%nNo account, no cloud and no internet connection are needed. Your speech never leaves this computer.%n%nIt's recommended that you close other applications before continuing.

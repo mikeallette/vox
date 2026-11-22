@@ -35,11 +35,11 @@ public partial class MainWindow : Window
         PopulateSettings();
         RefreshMeetingFiles();
         RefreshStatus();
-        VersionText.Text = "Vox " + (typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "") + "  ·  everything runs locally";
+        VersionText.Text = "VOX " + (typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "") + " · MIT LICENSE";
 
         S.Dictation.StateChanged += (_, _) => Dispatcher.Invoke(RefreshStatus);
         S.ModelChanged += () => Dispatcher.Invoke(() => { RefreshStatus(); PopulateModels(); });
-        S.PrivateModeChanged += () => Dispatcher.Invoke(() => { bool was = _loading; _loading = true; ChkPrivate.IsChecked = S.Settings.PrivateMode; _loading = was; });
+        S.PrivateModeChanged += () => Dispatcher.Invoke(() => { bool was = _loading; _loading = true; ChkPrivate.IsChecked = S.Settings.PrivateMode; _loading = was; RefreshStatus(); });
         S.Meeting.Status += m => Dispatcher.Invoke(() => MeetingStatus.Text = m);
         S.Meeting.LineAdded += (who, text) => Dispatcher.Invoke(() =>
         {
@@ -84,9 +84,9 @@ public partial class MainWindow : Window
             _ when !S.Engine.IsLoaded => ("No model", "#C0392B"),
             _ => ("Ready", "#3DBE8B"),
         };
-        StatusText.Text = text;
+        StatusText.Text = text.ToUpperInvariant();
         StatusDot.Fill = (Brush)new BrushConverter().ConvertFromString(color)!;
-        StatusModel.Text = model;
+        StatusModel.Text = (S.Settings.PrivateMode ? "PRIVATE MODE · " : "") + ShortModel(model);
         NoModelBanner.Visibility = !S.Engine.IsLoaded && !S.ModelLoading && !S.AnyModelAvailable ? Visibility.Visible : Visibility.Collapsed;
         HintText.Text = HotkeyHints();
     }
@@ -96,10 +96,25 @@ public partial class MainWindow : Window
         var c = S.Settings.DictationCombo;
         string k = c.ToString(), paste = S.Settings.PasteLastCombo.ToString();
         string handsFree = c.Keys.Contains(Native.VK_SPACE) ? $"Double-tap {k}" : $"Add Space (or double-tap {k})";
-        return $"Hold {k} and speak. Release to insert the text where your cursor is. {handsFree} for hands-free; press {k} again to finish. Esc cancels. {paste} pastes your last dictation.";
+        return $"Hold {k} in any app, speak, and let go. {handsFree} for hands-free, {k} again to finish. Esc cancels. {paste} pastes the last one again.";
     }
 
-    void UpdateHistoryCount() => HistoryCount.Text = S.Data.History.Count == 0 ? "Nothing yet. Hold your shortcut and say something." : $"{S.Data.History.Count} dictations";
+    void UpdateHistoryCount()
+    {
+        var h = S.Data.History;
+        HistoryCount.Text = h.Count == 0 ? "NOTHING YET. HOLD YOUR SHORTCUT AND SAY SOMETHING." : $"{h.Count} DICTATIONS · NEWEST FIRST";
+        var today = h.Where(e => e.Time.Date == DateTime.Today).ToList();
+        StatToday.Text = today.Count.ToString("N0");
+        StatWords.Text = today.Sum(e => e.Words).ToString("N0");
+        var timed = (today.Count > 0 ? today : h.Take(20).ToList()).Where(e => e.TranscribeMs > 0).ToList();
+        StatWait.Text = timed.Count == 0 ? "-" : $"{timed.Average(e => e.TranscribeMs) / 1000.0:0.0} s";
+        NotebookLine.Text = $"NOTEBOOK · {DateTime.Now:dddd MMMM d}".ToUpperInvariant() + $" · {h.Count:N0} ENTRIES";
+    }
+
+    // ---------- about ----------
+    const string ReleasesUrl = "https://github.com/mikeallette/vox/releases/latest";
+    void CheckUpdates_Click(object sender, RoutedEventArgs e) => OpenPath(ReleasesUrl);   // the browser goes online, never Vox
+    void OpenLicenses_Click(object sender, RoutedEventArgs e) => OpenPath(Path.Combine(AppContext.BaseDirectory, "licenses"));
 
     // ---------- history ----------
     void CopyEntry_Click(object sender, RoutedEventArgs e)
@@ -375,6 +390,15 @@ public partial class MainWindow : Window
         return n;
     }
 
+    /// <summary>Short status-strip name: "PARAKEET V3", "QWEN3-ASR", else the file name.</summary>
+    static string ShortModel(string model)
+    {
+        if (string.IsNullOrEmpty(model)) return "NO MODEL";
+        if (model.Contains("parakeet-tdt-0.6b-v3", StringComparison.OrdinalIgnoreCase)) return "PARAKEET V3";
+        if (model.Contains("qwen3", StringComparison.OrdinalIgnoreCase)) return "QWEN3-ASR";
+        return model.ToUpperInvariant();
+    }
+
     static void SelectByTag(ComboBox box, string tag)
     {
         foreach (ComboBoxItem it in box.Items)
@@ -508,4 +532,17 @@ public partial class MainWindow : Window
     void OpenLog_Click(object sender, RoutedEventArgs e) => OpenPath(Log.Path_);
 
     static class Mouse { public static System.Windows.Input.Cursor? OverrideCursor { set => System.Windows.Input.Mouse.OverrideCursor = value; } }
+}
+
+/// <summary>"2026-11-20 14-00 Design review.md" shows as "Design review" (the date and time are on the line above it).</summary>
+public sealed class MeetingTitleConverter : System.Windows.Data.IValueConverter
+{
+    static readonly System.Text.RegularExpressions.Regex Stamp = new(@"^\d{4}-\d{2}-\d{2} \d{2}-\d{2} ");
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+        var name = Path.GetFileNameWithoutExtension(value as string ?? "");
+        var title = Stamp.Replace(name, "");
+        return title.Length > 0 ? title : name;
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) => System.Windows.Data.Binding.DoNothing;
 }

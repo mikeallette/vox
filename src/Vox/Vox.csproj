@@ -11,7 +11,7 @@
     <RootNamespace>Vox</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\vox.ico</ApplicationIcon>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Authors>Mike Allette</Authors>
     <Company>Vox</Company>
     <Copyright>Copyright (c) 2026 Mike Allette. MIT License.</Copyright>
@@ -33,6 +33,8 @@
 
   <ItemGroup>
     <Resource Include="Assets\vox.ico" />
+    <!-- Newsreader and IBM Plex Mono (SIL Open Font License, texts in licenses\) -->
+    <Resource Include="Assets\Fonts\*.ttf" />
   </ItemGroup>
 
   <ItemGroup>

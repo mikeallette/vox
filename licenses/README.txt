@@ -13,6 +13,8 @@ onnxruntime-LICENSE.txt           ONNX Runtime, shipped inside sherpa-onnx (MIT,
 Apache-2.0.txt                    sherpa-onnx (k2-fsa), NVIDIA NeMo TitaNet-Small speaker model,
                                   and the optional Qwen3-ASR model (Apache License 2.0)
 CC-BY-4.0.txt                     NVIDIA Parakeet TDT 0.6B v3 speech model (attribution notice)
+Newsreader-OFL.txt                Newsreader typeface, built into the app (SIL Open Font License 1.1)
+IBMPlexMono-OFL.txt               IBM Plex Mono typeface, built into the app (SIL Open Font License 1.1)
 dotnet-runtime-LICENSE.txt        .NET runtime bundled with the app (MIT, .NET Foundation)
 dotnet-ThirdPartyNotices.txt      Third-party notices of the .NET runtime
 

@@ -15,6 +15,8 @@ license texts ship with the app in the `licenses` folder (see `licenses/README.t
 | ONNX Runtime 1.28 (via sherpa-onnx) | Meeting speaker labels | MIT | https://github.com/microsoft/onnxruntime |
 | NAudio 2.2.1 | Microphone and meeting audio capture | MIT | https://github.com/naudio/NAudio |
 | .NET 8 runtime (self-contained) | App runtime | MIT | https://github.com/dotnet/runtime |
+| Newsreader typeface (Production Type) | App text | SIL OFL 1.1 | https://github.com/productiontype/Newsreader |
+| IBM Plex Mono typeface (IBM) | App labels | SIL OFL 1.1 | https://github.com/IBM/plex |
 | Microsoft Visual C++ runtime DLLs | Needed by the native engines | Microsoft Visual C++ Redistributable license | https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist |
 
 ## Models
