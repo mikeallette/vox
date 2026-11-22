@@ -156,10 +156,25 @@
                 </StackPanel>
                 <DataGrid x:Name="SnipGrid" Grid.Row="1" Margin="0,16,0,0" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
                           HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource Line}" Background="White" BorderBrush="{StaticResource Line}"
-                          RowHeight="34" FontSize="14" CellEditEnding="Grid_Changed" RowEditEnding="Grid_Changed">
+                          MinRowHeight="34" FontSize="14" CellEditEnding="Grid_Changed" RowEditEnding="Grid_Changed">
+                    <!-- rows grow to fit multi-line snippets; in "Type this", Enter starts a new line (Tab or a click elsewhere saves) -->
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="When I say" Binding="{Binding Trigger}" Width="240"/>
-                        <DataGridTextColumn Header="Type this" Binding="{Binding Text}" Width="*"/>
+                        <DataGridTextColumn Header="When I say" Binding="{Binding Trigger}" Width="240">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock"><Setter Property="Margin" Value="4,8"/><Setter Property="TextWrapping" Value="Wrap"/></Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Type this" Binding="{Binding Text}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock"><Setter Property="Margin" Value="4,8"/><Setter Property="TextWrapping" Value="Wrap"/></Style>
+                            </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="AcceptsReturn" Value="True"/><Setter Property="TextWrapping" Value="Wrap"/>
+                                    <Setter Property="Padding" Value="2,6"/><Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
