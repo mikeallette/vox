@@ -37,6 +37,7 @@ Remove-Item -Recurse -Force $work -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force "$work\src" | Out-Null
 & robocopy "$root\src\Vox" "$work\src\Vox" /E /XD bin obj /NFL /NDL /NJH /NJS /NP | Out-Null
 & robocopy "$root\vendor" "$work\vendor" /E /NFL /NDL /NJH /NJS /NP | Out-Null
+& robocopy "$root\licenses" "$work\licenses" /E /NFL /NDL /NJH /NJS /NP | Out-Null
 
 # 2. publish (self-contained: the target PC needs no .NET install)
 $stage = Join-Path $work 'stage\app'
@@ -48,6 +49,7 @@ Remove-Item -Force "$stage\models\*.bin" -ErrorAction SilentlyContinue
 Copy-Item "$root\LICENSE" "$stage\LICENSE.txt" -Force
 Copy-Item "$root\THIRD-PARTY-NOTICES.md" $stage -Force
 Copy-Item "$root\packaging\README.txt" $stage -Force
+if (-not (Test-Path "$stage\licenses\Apache-2.0.txt")) { throw "license texts missing from the build (licenses\)" }
 
 # 3. models
 if (-not $NoModels) {
