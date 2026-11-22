@@ -1,0 +1,66 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>hero</title>
+<style>
+  html,body{margin:0;padding:0;background:#111317}
+  .hero{width:1280px;height:600px;position:relative;overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif;color:#F2F3F5;
+    background:radial-gradient(900px 520px at 88% 30%, rgba(14,124,134,.38), transparent 70%),
+               radial-gradient(700px 500px at 0% 100%, rgba(14,124,134,.16), transparent 70%),
+               linear-gradient(180deg,#16181D 0%,#111317 100%);}
+  .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:40px 40px;mask-image:linear-gradient(90deg,transparent,black 40%,black 70%,transparent)}
+  .left{position:absolute;left:84px;top:92px;width:560px}
+  .brand{display:flex;align-items:center;gap:22px}
+  .logo{width:84px;height:84px;border-radius:22px;background:linear-gradient(160deg,#18A0AC,#0B6670);display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 10px 30px rgba(14,124,134,.45), inset 0 1px 0 rgba(255,255,255,.25)}
+  .logo i{display:block;width:7px;border-radius:4px;background:#fff}
+  h1{font-family:Georgia,serif;font-weight:400;font-size:104px;line-height:1;margin:0;letter-spacing:-1px}
+  .tag{font-size:32px;font-weight:600;margin:38px 0 14px;line-height:1.2;letter-spacing:-.3px}
+  .sub{font-size:19px;line-height:1.55;color:#AEB3BD;margin:0}
+  .keys{display:flex;align-items:center;gap:10px;margin-top:34px;font-size:18px;color:#8B909B}
+  kbd{font-family:"Segoe UI",sans-serif;font-size:18px;font-weight:600;color:#F2F3F5;background:linear-gradient(#2B2F38,#20232A);border:1px solid #3A3F4A;border-bottom-width:3px;border-radius:9px;padding:7px 16px}
+  .chips{display:flex;gap:8px;margin-top:30px}
+  .chip{white-space:nowrap;font-size:14px;font-weight:600;color:#9FD6DB;border:1px solid rgba(111,183,191,.35);background:rgba(14,124,134,.14);border-radius:999px;padding:7px 13px}
+  /* right side: an email being dictated */
+  .win{position:absolute;right:76px;top:86px;width:520px;background:#FAF8F4;color:#1A1C21;border-radius:16px;box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06);overflow:hidden}
+  .bar{height:40px;background:#ECE8DF;display:flex;align-items:center;padding:0 16px;gap:8px}
+  .bar b{width:12px;height:12px;border-radius:50%;background:#D5D0C6;display:block}
+  .bar span{font-size:13px;color:#6B6F78}.bar em{margin-left:auto;font-style:normal;font-size:14px;color:#6B6F78;letter-spacing:2px}
+  .mail{padding:22px 28px 30px}
+  .row{font-size:15px;color:#6B6F78;border-bottom:1px solid #E6E2D9;padding:8px 0}
+  .row strong{color:#1A1C21;font-weight:600}
+  .body{font-size:19px;line-height:1.6;margin-top:18px}
+  .typed{background:linear-gradient(transparent 62%, rgba(14,124,134,.16) 62%)}
+  .caret{display:inline-block;width:2px;height:22px;background:#0E7C86;vertical-align:-4px;margin-left:2px}
+  /* the Flow Bar */
+  .flow{position:absolute;right:186px;top:470px;height:52px;width:300px;border-radius:26px;background:rgba(23,26,32,.96);border:1px solid rgba(255,255,255,.22);box-shadow:0 12px 30px rgba(0,0,0,.5);display:flex;align-items:center;padding:0 22px;gap:14px;box-sizing:border-box}
+  .dot{width:11px;height:11px;border-radius:50%;background:#FF5A4F;box-shadow:0 0 12px rgba(255,90,79,.8)}
+  .wave{display:flex;align-items:center;gap:3px;height:30px;flex:1}
+  .wave i{display:block;width:4px;border-radius:2px;background:#F2F3F5;opacity:.9}
+  .flow span{font-size:16px;font-weight:600}
+  .note{position:absolute;right:186px;top:534px;width:300px;text-align:center;font-size:14px;color:#8B909B}
+</style></head>
+<body><div class="hero" id="cap">
+  <div class="grid"></div>
+  <div class="left">
+    <div class="brand">
+      <div class="logo"><i style="height:22px"></i><i style="height:40px"></i><i style="height:54px"></i><i style="height:34px"></i><i style="height:18px"></i></div>
+      <h1>Vox</h1>
+    </div>
+    <div class="tag">Private voice dictation for Windows.</div>
+    <p class="sub">Speak and your words are typed into any app. The speech model runs on your own PC, so nothing you say ever leaves it.</p>
+    <div class="keys"><span>Hold</span><kbd>Ctrl</kbd><span>+</span><kbd>Win</kbd><span>&nbsp;speak, let go.</span></div>
+    <div class="chips"><span class="chip">100% offline</span><span class="chip">No account</span><span class="chip">Meeting transcripts</span><span class="chip">Free &amp; open source</span></div>
+  </div>
+  <div class="win">
+    <div class="bar"><span>Board rev C thermal results - Message</span><em>&#x2013;&nbsp;&nbsp;&nbsp;&#x25A1;&nbsp;&nbsp;&nbsp;&#x2715;</em></div>
+    <div class="mail">
+      <div class="row">To&nbsp;&nbsp;<strong>Dana Brooks</strong></div>
+      <div class="row">Subject&nbsp;&nbsp;<strong>Board rev C thermal results</strong></div>
+      <div class="body">Hi Dana,<br><br><span class="typed">The new board passed thermal testing at 85°C with the 48 V input. I'll send the full report by 9:15 a.m. tomorrow.</span><span class="caret"></span></div>
+    </div>
+  </div>
+  <div class="flow"><div class="dot"></div><div class="wave" id="wave"></div><span>Listening</span></div>
+</div>
+<script>
+  const h=[6,10,16,24,14,28,20,12,26,30,18,9,22,27,15,8,19,25,11,6,14,9];
+  document.getElementById('wave').innerHTML=h.map(x=>`<i style="height:${x}px"></i>`).join('');
+</script>
+</body></html>

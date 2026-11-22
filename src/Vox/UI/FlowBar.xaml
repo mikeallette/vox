@@ -1,0 +1,20 @@
+<Window x:Class="Vox.UI.FlowBar"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False" Topmost="True" ShowActivated="False" Focusable="False"
+        ResizeMode="NoResize" Width="360" Height="76" IsHitTestVisible="False">
+    <Grid>
+        <Border x:Name="Pill" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12"
+                Width="48" Height="10" CornerRadius="19" Background="#F0171A20" BorderBrush="#40FFFFFF" BorderThickness="1">
+            <Border.Effect><DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.35"/></Border.Effect>
+            <Grid x:Name="Inner" Opacity="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="14,0">
+                    <Ellipse x:Name="Dot" Width="9" Height="9" Fill="#FF5A4F" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <Canvas x:Name="Wave" Width="112" Height="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock x:Name="Label" Foreground="#F2F3F5" FontSize="13" FontFamily="Segoe UI Semibold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

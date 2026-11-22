@@ -1,0 +1,271 @@
+# QA test T1: cleanup rule cases. Columns: group <TAB> what the speech model wrote <TAB> what Vox must type ("=" = unchanged).
+# Run: Vox.exe --rule-tests out.md tests\rules.tsv
+# Units
+units	The rail is forty eight volts.	The rail is 48 V.
+units	The rail is 48 volts.	The rail is 48 V.
+units	The rail is 48V.	The rail is 48 V.
+units	The rail is 48-volt.	The rail is 48 V.
+units	It pulls eight amps at full load.	It pulls 8 A at full load.
+units	It pulls 8 Amps at full load.	It pulls 8 A at full load.
+units	The phase current is 12.5 amps.	The phase current is 12.5 A.
+units	It draws 300 milliamps.	It draws 300 mA.
+units	It draws 300mA.	It draws 300 mA.
+units	The ripple is fifty millivolts.	The ripple is 50 mV.
+units	The ripple is 50mV.	The ripple is 50 mV.
+units	Switching at four hundred kilohertz.	Switching at 400 kHz.
+units	Switching at 400 khz.	Switching at 400 kHz.
+units	Switching at 400kHz.	Switching at 400 kHz.
+units	The clock is twenty five megahertz.	The clock is 25 MHz.
+units	Line frequency is sixty hertz.	Line frequency is 60 Hz.
+units	Use a ten K pull up.	Use a 10 kΩ pull up.
+units	Use a 10k pull-up resistor.	Use a 10 kΩ pull-up resistor.
+units	Use a 10k resistor.	Use a 10 kΩ resistor.
+units	Use a 10 K ohm resistor.	Use a 10 kΩ resistor.
+units	Use a 4.7 kilohm resistor.	Use a 4.7 kΩ resistor.
+units	The sense resistor is five milliohms.	The sense resistor is 5 mΩ.
+units	Gate resistor is ten ohms.	Gate resistor is 10 Ω.
+units	The bleeder is one megohm.	The bleeder is 1 MΩ.
+units	Isolation is 3 kilovolts.	Isolation is 3 kV.
+units	The output is two point five kilowatts.	The output is 2.5 kW.
+units	Losses are 250 milliwatts.	Losses are 250 mW.
+units	It burns five watts.	It burns 5 W.
+units	Gain margin is ten dB.	Gain margin is 10 dB.
+units	Gain margin is 10 decibels.	Gain margin is 10 dB.
+units	Add a 100 microfarad cap.	Add a 100 µF cap.
+units	Add a 100uF cap.	Add a 100 µF cap.
+units	Add a 10 nanofarad cap.	Add a 10 nF cap.
+units	Add a 22 picofarad cap.	Add a 22 pF cap.
+units	The inductor is 4.7 microhenries.	The inductor is 4.7 µH.
+units	The board is 160 millimeters wide.	The board is 160 mm wide.
+units	The board is 160mm wide.	The board is 160 mm wide.
+units	Keep 8 millimeter creepage.	Keep 8 mm creepage.
+units	Two point two K ohm.	2.2 kΩ.
+units	The input is 800 volts and the output is 270 volts.	The input is 800 V and the output is 270 V.
+units	One hundred and twenty volts.	120 V.
+units	Twelve hundred volts.	1200 V.
+# Must NOT change (negatives)
+negative	One of the boards failed.	=
+negative	I want to rate the movie.	=
+negative	Option 2 A is better.	=
+negative	We have 5 apples.	=
+negative	Plan A and plan B.	=
+negative	Grade A work.	=
+negative	I bought 3 Vans.	=
+negative	Two of them said yes.	=
+negative	It took three tries.	=
+negative	Section 4 V of the spec.	Section 4 V of the spec.
+negative	Read chapter ten.	=
+negative	The kids are eight and five.	=
+negative	At one point two people left.	=
+negative	At one point, two people left.	=
+negative	Meet me at Route 1.	=
+negative	I have a 2k budget.	=
+negative	That's 1k words.	=
+negative	Ten volunteers came.	=
+negative	It was a one-off.	=
+negative	Thanks for everything.	=
+negative	The amplifier is fine.	=
+negative	Volume is up.	=
+negative	We watched the Avengers.	=
+negative	Ohm's law applies.	=
+negative	The mass is 5 kilograms.	=
+negative	The MOSFET is fine.	=
+# Percent and money
+percent	Efficiency is ninety six percent.	Efficiency is 96%.
+percent	Efficiency is 96 percent.	Efficiency is 96%.
+percent	Duty cycle is forty five percent.	Duty cycle is 45%.
+percent	Derate to 80 per cent.	Derate to 80%.
+percent	It is 12.5 percent higher.	It is 12.5% higher.
+money	It costs fifty dollars.	It costs $50.
+money	It costs 1,200 dollars.	It costs $1,200.
+money	The part is 3.25 dollars.	The part is $3.25.
+money	A dollar is fine.	=
+# Times
+time	Meet at nine thirty a m.	Meet at 9:30 a.m.
+time	Meet at 9:30 am.	Meet at 9:30 a.m.
+time	Meet at 9:30 AM.	Meet at 9:30 a.m.
+time	Meet at 930am.	Meet at 9:30 a.m.
+time	Meet at 9.30am.	Meet at 9:30 a.m.
+time	Call at 8 10 pm.	Call at 8:10 p.m.
+time	Call at 8-10 pm.	Call at 8:10 p.m.
+time	Call at eight ten p m.	Call at 8:10 p.m.
+time	Call at 10am.	Call at 10 a.m.
+time	Call at 10 AM.	Call at 10 a.m.
+time	Call at tenam.	Call at 10 a.m.
+time	Call at eight pm.	Call at 8 p.m.
+time	Call at 8 p.m. tomorrow.	=
+time	Call at 12:45 p.m.	=
+time	It is 11 PM now.	It is 11 p.m. now.
+time	I am going.	=
+time	I am 5 minutes late.	=
+time	The pm2.5 level.	=
+# Dates
+date	Due May tenth.	Due May 10.
+date	Due December 2nd.	Due December 2.
+date	Due July twenty-eighth.	Due July 28.
+date	Due March 15th.	Due March 15.
+date	Due November 14th.	Due November 14.
+date	May the force be with you.	=
+date	I may first check.	=
+# Versions and decimals
+version	Runtime eight point zero point three.	Runtime 8.0.3.
+version	Version one point two.	Version 1.2.
+version	Version 10.0.14.	=
+version	Gain is two point five.	Gain is 2.5.
+# Degrees
+degrees	Ambient is twenty five degrees C.	Ambient is 25°C.
+degrees	Ambient is 25 degrees C.	Ambient is 25°C.
+degrees	Rated 105 degreC.	Rated 105°C.
+degrees	Turn 90 degrees.	Turn 90°.
+# Dictionary and sound-alike
+dict	Check the bomb before release.	Check the BOM before release.
+dict	Check the VOM before release.	Check the BOM before release.
+dict	Look at the boat plot.	Look at the Bode plot.
+dict	Look at the Boat plot.	Look at the Bode plot.
+dict	The MOS FET is hot.	The MOSFET is hot.
+dict	The Mosfet is hot.	The MOSFET is hot.
+dict	Check the data sheet.	Check the datasheet.
+dict	Check the data sheet to Mark.	Check the datasheet to Mark.
+dict	Send the data sheet to Mark.	Send the datasheet to Mark.
+dict	Add derating.	=
+dict	Durate the part.	Derate the part.
+dict	The I squared C bus.	The I2C bus.
+dict	The I two C bus.	The I2C bus.
+dict	Run an EMI scan.	=
+dict	Run an E M I scan.	Run an EMI scan.
+dict	Check the creepage across the gap.	=
+dict	Check the freakage across the gap.	Check the creepage across the gap.
+dict	Use a butt converter.	Use a buck converter.
+dict	Check the game margin.	Check the gain margin.
+dict	Set the flanking time.	Set the blanking time.
+dict	Measure the turnoff loss.	Measure the turn-off loss.
+dict	The Z wave stick.	The Z-Wave stick.
+dict	The Aotech hub.	The Aeotec hub.
+dict	The GAN devices.	The GaN devices.
+dict	Use LTspice and check.	=
+dict	Run the hypot test.	Run the hipot test.
+dict	The optocoupla failed.	The optocoupler failed.
+dict	Check the magnetics.	=
+dict	Magnetics design.	=
+dict	Youth group is tonight.	=
+dict	Go to grandma's house.	Go to Grandma's house.
+dict	The kick off meeting.	The kickoff meeting.
+dict	A birthday cart.	A birthday card.
+dict	The burning test.	The burn-in test.
+# Dictionary must leave everyday words alone
+dict-negative	The data is fine.	=
+dict-negative	Put the sheet away.	=
+dict-negative	The bomb squad came.	The BOM squad came.
+dict-negative	Rain is coming.	=
+dict-negative	The rainy day.	=
+dict-negative	He will rate it.	=
+dict-negative	Magnets are strong.	=
+dict-negative	The emit pin.	=
+dict-negative	A moss covered rock.	=
+dict-negative	The game was fun.	=
+dict-negative	Turn on the light.	=
+dict-negative	Turn off the light.	=
+dict-negative	Mark sent it.	=
+dict-negative	The youth pastor.	=
+# Capitals and greetings
+caps	Hi mark, how are you?	Hi Mark, how are you?
+caps	Hello priya, thanks.	Hello Priya, thanks.
+caps	Hi all, quick update.	=
+caps	Hi everyone.	=
+caps	Hey there.	=
+caps	Hy Priya, thanks.	Hi Priya, thanks.
+caps	Pull up on The I2C bus.	Pull up on the I2C bus.
+caps	Send it to The team.	Send it to the team.
+caps	The board is ready.	=
+caps	I read The Hobbit.	=
+caps	the board is ready.	The board is ready.
+# Voice commands
+command	Hi Mark, new line, thanks for the update.	Hi Mark,\nThanks for the update.
+command	First item. New paragraph. Second item.	First item.\n\nSecond item.
+command	First item newline second item.	First item\nSecond item.
+command	The new line of products.	=
+command	We need a new paragraph about safety.	=
+command	Thanks, new paragraph, see you soon.	Thanks,\n\nSee you soon.
+# Fillers and non-speech
+filler	Um, I think so.	I think so.
+filler	I think, uh, it works.	I think, it works.
+filler	So uh we start.	So we start.
+filler	Hmm.
+filler	[BLANK_AUDIO]
+filler	(music) Hello.	Hello.
+filler	Uh-huh, that works.	That works.
+filler	The umbrella is wet.	=
+filler	Ahmed came.	=
+# Mixed real-style sentences
+mixed	The LLC runs at four hundred kilohertz with ninety six percent efficiency.	The LLC runs at 400 kHz with 96% efficiency.
+mixed	Derate the MOSFET to eighty percent of six hundred fifty volts.	Derate the MOSFET to 80% of 650 V.
+mixed	Microsoft Windows Desktop runtime eight point zero point three.	Microsoft Windows Desktop runtime 8.0.3.
+# Known limit: a count said right before a spoken value is left as words (could be "one twenty" = 120)
+limit	Use two ten K resistors.	=
+limit	Four twelve volt rails.	=
+mixed	We need three 48 volt supplies.	We need three 48 V supplies.
+restart	Yeah, I should be able to only download I I should be able to download the models.	Yeah, I should be able to download the models.
+restart	Download the models on on my work laptop.	Download the models on my work laptop.
+restart	The the board is ready.	The board is ready.
+restart	I I think so.	I think so.
+restart	He had had enough.	=
+restart	It was so so.	=
+restart	That that is fine.	=
+restart	It is very very hot.	=
+restart	I want to go home and I want to go home now.	=
+restart	Check the dead time, check the dead time again.	=
+restart	We need to check the we need to check the gate drive.	We need to check the gate drive.
+restart	Bye bye.	=
+dict	I used my Google sign and it won't let me change it.	I used my Google sign-in and it won't let me change it.
+dict	I used my Google sign in to log on.	I used my Google sign-in to log on.
+dict-negative	I used my Google sign-in for this.	=
+dict	I'm setting up the dual factor authentication.	I'm setting up the two-factor authentication.
+dict	Turn on two factor authentication.	Turn on two-factor authentication.
+dict-negative	Two-factor authentication is on.	=
+# Script read 2026-11-11 (25 sentences read aloud; Wispr Flow's formatting taken as the target)
+degrees	The plot shows about fifty-five degrees of phase margin and a two-kHz crossover.	The plot shows about 55° of phase margin and a 2 kHz crossover.
+degrees	Running hot around eighty-five degrees c. on the thermal camera.	Running hot around 85°C on the thermal camera.
+degrees	Running hot around 85 degrees Celsius on the camera.	Running hot around 85°C on the camera.
+degrees	It hit one hundred degrees Fahrenheit outside.	It hit 100°F outside.
+degrees	Some degrees of freedom.	=
+time	We need to leave for church by nine fifteen on Sunday morning.	We need to leave for church by 9:15 on Sunday morning.
+time	Meet me at two thirty.	Meet me at 2:30.
+time	We had nine fifteen people.	=
+time	It should take about forty five minutes.	It should take about 45 minutes.
+time	It should take about forty-five minutes.	It should take about 45 minutes.
+time	Give me five minutes.	=
+time	It took twelve hours.	It took 12 hours.
+period	Put a pull-down on the gate. and a cap on the rail.	Put a pull-down on the gate and a cap on the rail.
+period	Update the BOM before Friday. for the design review.	Update the BOM before Friday for the design review.
+period	See you at 9 a.m. on Tuesday.	=
+period	Use a resistor, e.g. the 10 kΩ one.	=
+period	It works. Then we ship it.	=
+commands	New paragraph. Let me know if you have any questions.	\n\nLet me know if you have any questions.
+# Repeated words and short restarts (2026-11-11: stutters Vox missed and Wispr Flow cleaned)
+restart	So the two-factor authentication authentication on my Google sign-in.	So the two-factor authentication on my Google sign-in.
+restart	Check the the waveform waveform on the scope.	Check the waveform on the scope.
+restart	The resistor, resistor value is wrong.	The resistor value is wrong.
+restart	Make sure there's no running No ringing past 20 V.	Make sure there's no ringing past 20 V.
+restart	Make sure there's no running, no ringing past 20 V.	Make sure there's no ringing past 20 V.
+restart	It was very very hot.	=
+restart	Bye bye, see you soon.	=
+restart	I knew that that was wrong.	=
+restart	He had had enough.	=
+restart	No cats, no dogs allowed.	=
+restart	We need the board, the box and the cable.	=
+restart	Pretty pretty please.	=
+restart	Hello, hello, hello.	=
+restart	What's what's what's the stuff in my way?	What's the stuff in my way?
+# Words in another alphabet from a mumble (2026-11-11: "Безмарой.")
+foreign	If there's anything else we can too. Безмарой. Oh my gosh, but another feature.	If there's anything else we can too. Oh my gosh, but another feature.
+foreign	Put a 10 kΩ resistor and a 4.7 µF cap.	=
+foreign	The phase is 30° and Ω is the symbol.	=
+microfarad	Put a 4.7 micro farad cap on the rail.	Put a 4.7 µF cap on the rail.
+microfarad	Add a ten nano farad cap.	Add a 10 nF cap.
+microfarad	Use four point seven microfarads.	Use 4.7 µF.
+years	The viewing is on November 14, two thousand twenty-six, and it is about 45 minutes.	The viewing is on November 14, 2026, and it is about 45 minutes.
+years	It shipped in two thousand nine.	It shipped in 2009.
+years	We have two thousand units.	=
+years	Since two thousand twenty one we use it.	Since 2021 we use it.
+years	In two thousand twenty five hundred people came.	=
+years	The meeting is on November fourteenth, two thousand twenty-six.	The meeting is on November 14, 2026.

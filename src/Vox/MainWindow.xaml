@@ -1,0 +1,252 @@
+﻿<Window x:Class="Vox.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Vox" Icon="Assets/vox.ico" Width="1020" Height="700" MinWidth="820" MinHeight="560"
+        Background="{StaticResource Paper}" Foreground="{StaticResource Ink}" WindowStartupLocation="CenterScreen" FontFamily="Segoe UI">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="210"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Background="{StaticResource Sidebar}">
+            <DockPanel Margin="14,22,14,16">
+                <StackPanel DockPanel.Dock="Top" Margin="6,0,0,22">
+                    <TextBlock Text="Vox" FontFamily="Georgia" FontSize="30" Foreground="White"/>
+                    <TextBlock Text="private voice dictation" FontSize="11.5" Foreground="#8B909B" Margin="1,0,0,0"/>
+                </StackPanel>
+                <Border DockPanel.Dock="Bottom" Background="#20232A" CornerRadius="10" Padding="12,10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse x:Name="StatusDot" Width="8" Height="8" Fill="#E0A030" Margin="0,0,8,0"/>
+                            <TextBlock x:Name="StatusText" Text="Starting..." Foreground="White" FontSize="12.5" FontFamily="Segoe UI Semibold"/>
+                        </StackPanel>
+                        <TextBlock x:Name="StatusModel" Foreground="#8B909B" FontSize="11" Margin="16,3,0,0" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="Offline. Nothing leaves this PC." Foreground="#6FB7BF" FontSize="11" Margin="16,3,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <StackPanel>
+                    <RadioButton x:Name="NavDictation" Style="{StaticResource NavRadio}" Content="Dictation" GroupName="nav" IsChecked="True" Checked="Nav_Checked" Tag="Dictation"/>
+                    <RadioButton x:Name="NavMeetings" Style="{StaticResource NavRadio}" Content="Meetings" GroupName="nav" Checked="Nav_Checked" Tag="Meetings"/>
+                    <RadioButton Style="{StaticResource NavRadio}" Content="Dictionary" GroupName="nav" Checked="Nav_Checked" Tag="Dictionary"/>
+                    <RadioButton Style="{StaticResource NavRadio}" Content="Snippets" GroupName="nav" Checked="Nav_Checked" Tag="Snippets"/>
+                    <RadioButton Style="{StaticResource NavRadio}" Content="Settings" GroupName="nav" Checked="Nav_Checked" Tag="Settings"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="34,28,34,24">
+
+            <!-- ============ Dictation ============ -->
+            <Grid x:Name="PanelDictation">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="Dictation" Style="{StaticResource H1}"/>
+                    <TextBlock x:Name="HintText" Style="{StaticResource Sub}"/>
+                </StackPanel>
+                <Border x:Name="NoModelBanner" Grid.Row="1" Style="{StaticResource CardBorder}" Background="#FFF4E0" BorderBrush="#F0D9A8" Margin="0,16,0,0" Visibility="Collapsed">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Choose a model..." Style="{StaticResource PrimaryButton}" Click="ImportModel_Click" VerticalAlignment="Center"/>
+                        <StackPanel Margin="0,0,14,0">
+                            <TextBlock Text="No speech model found" FontFamily="Segoe UI Semibold" FontSize="14"/>
+                            <TextBlock Style="{StaticResource Sub}" Text="Vox needs a Whisper model file (ggml-*.bin) to understand speech. Import one and it stays on this PC."/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+                <Grid Grid.Row="2" Margin="0,18,0,8">
+                    <TextBlock Text="History" FontFamily="Segoe UI Semibold" FontSize="15" VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock x:Name="HistoryCount" Style="{StaticResource Sub}" VerticalAlignment="Center" Margin="0,0,14,0"/>
+                        <Button Content="Open data folder" Style="{StaticResource GhostButton}" Click="OpenData_Click" Margin="0,0,8,0"/>
+                        <Button Content="Clear all" Style="{StaticResource GhostButton}" Click="ClearHistory_Click"/>
+                    </StackPanel>
+                </Grid>
+                <ListBox x:Name="HistoryList" Grid.Row="3" BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0,0,0,10"/>
+                            <Setter Property="Template">
+                                <Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter/></ControlTemplate></Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource CardBorder}" Padding="16,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource Sub}" FontSize="11.5">
+                                            <Run Text="{Binding TimeLabel, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding App, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Words, Mode=OneWay}"/><Run Text=" words  ·  "/><Run Text="{Binding TranscribeMs, Mode=OneWay}"/><Run Text=" ms"/>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="14.5" Margin="0,5,0,0" LineHeight="21"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="12,0,0,0">
+                                        <Button Content="Copy" Style="{StaticResource GhostButton}" Padding="10,4" Tag="{Binding}" Click="CopyEntry_Click"/>
+                                        <Button Content="Delete" Style="{StaticResource GhostButton}" Padding="10,4" Margin="6,0,0,0" Tag="{Binding}" Click="DeleteEntry_Click"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <!-- ============ Meetings ============ -->
+            <Grid x:Name="PanelMeetings" Visibility="Collapsed">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="170"/></Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Meetings" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource Sub}" Text="Works with Teams, Zoom, Google Meet or any other call app: Vox records your microphone (You) and whatever the PC plays on its speakers or headset (the other people), transcribes it on this PC, and saves a Markdown (.md) transcript. With the speaker models installed, other voices are labeled Speaker 1, Speaker 2, ... Nothing is uploaded. Ask before recording people."/>
+                </StackPanel>
+                <Border Grid.Row="1" Style="{StaticResource CardBorder}" Margin="0,16,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Meeting title" Style="{StaticResource Label}" Margin="0,0,0,5"/>
+                            <TextBox x:Name="MeetingTitle" Text="Meeting" Padding="8,7" FontSize="14" MaxWidth="420" HorizontalAlignment="Left" Width="420"/>
+                            <TextBlock x:Name="MeetingStatus" Style="{StaticResource Sub}" Margin="0,10,0,0" Text="Ready."/>
+                        </StackPanel>
+                        <Button x:Name="MeetingButton" Grid.Column="1" Content="Start recording" Style="{StaticResource PrimaryButton}" Click="Meeting_Click" VerticalAlignment="Center" FontSize="14" Padding="24,12"/>
+                    </Grid>
+                </Border>
+                <ListBox x:Name="LiveTranscript" Grid.Row="2" Margin="0,14,0,0" BorderBrush="{StaticResource Line}" Background="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="4,3" FontSize="13.5"/></DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Grid Grid.Row="3" Margin="0,16,0,6">
+                    <TextBlock Text="Saved transcripts" FontFamily="Segoe UI Semibold" FontSize="15" VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Rename speakers..." Style="{StaticResource GhostButton}" Click="RenameSpeakers_Click" Margin="0,0,8,0" ToolTip="Put real names on Speaker 1, Speaker 2, ... in the selected transcript"/>
+                        <Button Content="Open meetings folder" Style="{StaticResource GhostButton}" Click="OpenMeetings_Click"/>
+                    </StackPanel>
+                </Grid>
+                <ListBox x:Name="MeetingFiles" Grid.Row="4" BorderBrush="{StaticResource Line}" Background="White" MouseDoubleClick="MeetingFile_DoubleClick">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate><TextBlock Text="{Binding Name}" Margin="4,3" FontSize="13.5"/></DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <!-- ============ Dictionary ============ -->
+            <Grid x:Name="PanelDictionary" Visibility="Collapsed">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Dictionary" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource Sub}" Text="Names, jargon and product terms. Fill only 'Write as' to teach Vox a word (it listens for it and fixes capitalization). Add 'Heard as' to correct a repeat mistake, e.g. heard 'clawed code' → write 'Claude Code'."/>
+                </StackPanel>
+                <DataGrid x:Name="DictGrid" Grid.Row="1" Margin="0,16,0,0" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
+                          HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource Line}" Background="White" BorderBrush="{StaticResource Line}"
+                          RowHeight="34" FontSize="14" CellEditEnding="Grid_Changed" RowEditEnding="Grid_Changed" ColumnWidth="*">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Heard as (optional)" Binding="{Binding From}"/>
+                        <DataGridTextColumn Header="Write as" Binding="{Binding To}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <!-- ============ Snippets ============ -->
+            <Grid x:Name="PanelSnippets" Visibility="Collapsed">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Snippets" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource Sub}" Text="Say a short trigger phrase and Vox types the full text: your email, an address, a standard reply. Triggers are matched as whole words, so pick something you would not say by accident."/>
+                </StackPanel>
+                <DataGrid x:Name="SnipGrid" Grid.Row="1" Margin="0,16,0,0" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
+                          HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource Line}" Background="White" BorderBrush="{StaticResource Line}"
+                          RowHeight="34" FontSize="14" CellEditEnding="Grid_Changed" RowEditEnding="Grid_Changed">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="When I say" Binding="{Binding Trigger}" Width="240"/>
+                        <DataGridTextColumn Header="Type this" Binding="{Binding Text}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <!-- ============ Settings ============ -->
+            <ScrollViewer x:Name="PanelSettings" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <StackPanel MaxWidth="640" HorizontalAlignment="Left">
+                    <TextBlock Text="Settings" Style="{StaticResource H1}"/>
+
+                    <TextBlock Text="Where Vox saves your data" Style="{StaticResource Label}"/>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Change..." Style="{StaticResource GhostButton}" Click="ChangeFolder_Click" Margin="8,0,0,0"/>
+                        <TextBox x:Name="FolderBox" IsReadOnly="True" Padding="8,7"/>
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,4,0,0" Text="History, dictionary, snippets, meeting transcripts and models live here as plain files."/>
+
+                    <TextBlock Text="Speech model" Style="{StaticResource Label}"/>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Import model file..." Style="{StaticResource GhostButton}" Click="ImportModel_Click" Margin="8,0,0,0"/>
+                        <ComboBox x:Name="ModelCombo" Padding="8,6" SelectionChanged="Setting_Changed"/>
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,4,0,0" TextWrapping="Wrap" Text="Fast (Parakeet) types in about a second. Accurate mode (Qwen3-ASR, a .gguf file) heard about 3% more words right in testing but takes 2 to 4 times longer. Switch any time."/>
+                    <CheckBox x:Name="ChkHints" Content="Accurate mode: listen for my dictionary words (slower; mixed results in testing)" Margin="0,6,0,0" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+
+                    <TextBlock Text="Microphone" Style="{StaticResource Label}"/>
+                    <ComboBox x:Name="MicCombo" Padding="8,6" SelectionChanged="Setting_Changed"/>
+
+                    <TextBlock Text="Language" Style="{StaticResource Label}"/>
+                    <ComboBox x:Name="LangCombo" Padding="8,6" SelectionChanged="Setting_Changed"/>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,4,0,0" Text="English-only models (names ending .en) always use English."/>
+
+                    <TextBlock Text="Shortcuts" Style="{StaticResource Label}"/>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,0,0,6" TextWrapping="Wrap" Text="Click Change, then press the keys you want together and let go. Any mix of Ctrl, Alt, Shift and Win with up to two other keys works (for example Ctrl + Win, Ctrl + Alt, F9, Ctrl + Shift + Space). Esc cancels."/>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="190"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Hold to dictate" VerticalAlignment="Center"/>
+                        <TextBox x:Name="KeysDictation" Grid.Row="0" Grid.Column="1" IsReadOnly="True" Padding="8,6" Margin="0,3" FontFamily="Segoe UI Semibold"/>
+                        <Button Grid.Row="0" Grid.Column="2" Content="Change..." Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="dictation" Click="ChangeKeys_Click"/>
+                        <Button Grid.Row="0" Grid.Column="3" Content="Default" Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="dictation" Click="DefaultKeys_Click"/>
+                        <TextBlock Grid.Row="1" Text="Paste last dictation" VerticalAlignment="Center"/>
+                        <TextBox x:Name="KeysPaste" Grid.Row="1" Grid.Column="1" IsReadOnly="True" Padding="8,6" Margin="0,3" FontFamily="Segoe UI Semibold"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="Change..." Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="paste" Click="ChangeKeys_Click"/>
+                        <Button Grid.Row="1" Grid.Column="3" Content="Default" Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="paste" Click="DefaultKeys_Click"/>
+                        <TextBlock Grid.Row="2" Text="Copy last dictation" VerticalAlignment="Center"/>
+                        <TextBox x:Name="KeysCopy" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Padding="8,6" Margin="0,3" FontFamily="Segoe UI Semibold"/>
+                        <Button Grid.Row="2" Grid.Column="2" Content="Change..." Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="copy" Click="ChangeKeys_Click"/>
+                        <Button Grid.Row="2" Grid.Column="3" Content="Default" Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="copy" Click="DefaultKeys_Click"/>
+                    </Grid>
+                    <TextBlock x:Name="HotkeyHelp" Style="{StaticResource Sub}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Insert text by" Style="{StaticResource Label}"/>
+                    <ComboBox x:Name="InsertCombo" Padding="8,6" SelectionChanged="Setting_Changed"/>
+
+                    <TextBlock Text="Processing threads" Style="{StaticResource Label}"/>
+                    <ComboBox x:Name="ThreadsCombo" Padding="8,6" SelectionChanged="Setting_Changed"/>
+                    <TextBlock x:Name="CpuHelp" Style="{StaticResource Sub}" Margin="0,4,0,0"/>
+
+                    <TextBlock Text="Behavior" Style="{StaticResource Label}"/>
+                    <CheckBox x:Name="ChkLive" Content="Transcribe while I speak (shorter wait; splits at pauses)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkTrailing" Content="Add a space after each dictation" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkFillers" Content="Remove filler sounds (um, uh, hmm)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkNumbers" Content="Write numbers and units like an engineer (48 V, 8 A, 250 kHz, 10 kΩ, 8:10 p.m.)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkCommands" Content="Spoken commands: say 'new line' or 'new paragraph'" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkFlowBar" Content="Show the Flow Bar at all times" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkLaunch" Content="Start Vox when I sign in to Windows" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkHistory" Content="Keep dictation history" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkAudio" Content="Also keep the audio of each dictation (uses disk space)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkSysAudio" Content="Meetings: include system audio (Teams, Zoom, Meet)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+
+                    <TextBlock Text="Meeting audio from" Style="{StaticResource Label}"/>
+                    <ComboBox x:Name="MeetPlaybackCombo" Padding="8,6" SelectionChanged="Setting_Changed"/>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,4,0,0" Text="'Every playback device' catches the call whether it plays on the speakers or a headset, including one plugged in during the meeting."/>
+
+                    <TextBlock Text="Speaker labels" Style="{StaticResource Label}"/>
+                    <CheckBox x:Name="ChkSpeakers" Content="Tell the other voices apart (Speaker 1, Speaker 2, ...)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <DockPanel Margin="0,4,0,0">
+                        <Button DockPanel.Dock="Right" Content="Install speaker models..." Style="{StaticResource GhostButton}" Click="ImportSpeakerModels_Click" Margin="8,0,0,0" VerticalAlignment="Top"/>
+                        <TextBlock x:Name="SpeakerModelStatus" Style="{StaticResource Sub}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                    </DockPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,22,0,30">
+                        <Button Content="Open log file" Style="{StaticResource GhostButton}" Click="OpenLog_Click" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="VersionText" Style="{StaticResource Sub}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

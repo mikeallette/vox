@@ -1,0 +1,31 @@
+# Allow-list: this folder also holds private training data, recordings, models and notes.
+# Everything is ignored unless it is listed below. Add new public files here on purpose.
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/THIRD-PARTY-NOTICES.md
+!/build-release.ps1
+!/docs/
+!/src/
+!/vendor/
+!/packaging/
+!/tests/
+
+# packaging: only the installer script and the portable readme
+/packaging/*
+!/packaging/Vox.iss
+!/packaging/README.txt
+
+# tests: only the text-rule cases and the synthetic meeting generator
+/tests/*
+!/tests/rules.tsv
+!/tests/meeting/
+/tests/meeting/*
+!/tests/meeting/Make-MeetingTest.ps1
+
+# build output
+bin/
+obj/
+*.user
+.vs/

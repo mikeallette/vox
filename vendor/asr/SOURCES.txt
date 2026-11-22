@@ -1,0 +1,5 @@
+transcribe.cpp v0.4.1 prebuilt native files, lane windows-x86_64-cpu-vulkan (MIT; licenses\ folder).
+Downloaded 2026-11-11 from the project's GitHub release (transcribe-native-0.4.1-windows-x86_64-cpu-vulkan.tar.gz),
+SHA256 272eb97795048ccb557c85bb9dd44c9e530e1c928443114c39816a8a5f76269d. Used by Vox accurate mode (Core\QwenEngine.cs).
+Model (not shipped with the app; lives in the data folder's models\): Qwen3-ASR-1.7B-Q4_K_M.gguf from
+huggingface.co/handy-computer/qwen3-asr-1.7b-gguf, SHA256 b7afe3674f653fa84f712ed2440353c6e7cf7f93697fef76b05a26538b24844e (Apache-2.0).

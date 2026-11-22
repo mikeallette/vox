@@ -1,0 +1,18 @@
+﻿Speaker models used by Vox meeting speaker labels (downloaded 2026-11-08 from the official sherpa-onnx GitHub releases)
+
+Shipped with the app (this folder):
+  pyannote-segmentation.onnx  (5.7 MB)
+    = model.onnx from https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2
+    converted by k2-fsa from https://huggingface.co/pyannote/segmentation-3.0 (MIT license, see pyannote-segmentation-LICENSE.txt)
+    SHA-256 220AD67CA923BEF2FA91F2390C786097BF305BCEB5E261D4AF67B38E938E1079
+
+Added by the release build (build-release.ps1 copies it from models\speakers; too big to keep in git), and can
+also be imported in Settings > Speaker labels. License: Apache-2.0 (NeMo Toolkit license, per NVIDIA's model card):
+  nemo_en_titanet_small.onnx  (38.4 MB, 40,257,283 bytes)
+    https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/nemo_en_titanet_small.onnx
+    converted from NVIDIA NeMo TitaNet-Small (speaker verification, English)
+    SHA-256 AD4A1802485D8B34C722D2A9D04249662F2ECE5D28A7A039063CA22F515A789E
+
+Why TitaNet: on the synthetic meeting test (tests\meeting) its fingerprints were about 0.85 alike for one voice and
+0.2-0.35 for different voices. The CAM++ English model (3dspeaker_speech_campplus_sv_en_voxceleb_16k.onnx) could not
+tell the test voices apart (0.43 within vs 0.42 across) and WeSpeaker ResNet34 was in between.
