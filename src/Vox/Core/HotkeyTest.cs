@@ -109,6 +109,17 @@ internal static class HotkeyTest
             Dn(h, VK_LMENU); Dn(h, VK_LSHIFT); Dn(h, 'Z'); Up(h, 'Z'); Up(h, VK_LSHIFT); Up(h, VK_LMENU);
             Dn(h, VK_LCONTROL); Dn(h, VK_LMENU); Dn(h, 'V'); Up(h, 'V'); Up(h, VK_LMENU); Up(h, VK_LCONTROL);
             Check("Custom paste Ctrl+Alt+V replaces Alt+Shift+Z", Ev() == "paste", Ev());
+            // re-hear, and the "typed after the dictation" clock that guards scratch that / re-hear
+            h = New("Ctrl+Win"); h.RehearRequested += () => events.Add("rehear"); swallowed.Clear();
+            HotkeyService.LastUserKeyTick = 0;
+            Dn(h, VK_LMENU); Dn(h, VK_LSHIFT); Dn(h, 'R'); Up(h, 'R'); Up(h, VK_LSHIFT); Up(h, VK_LMENU);
+            Check("Alt+Shift+R = re-hear, and the R is swallowed", Ev() == "rehear" && swallowed.Contains("vR"), Ev() + " / " + string.Join(" ", swallowed));
+            Check("A Vox shortcut does not count as typing", HotkeyService.LastUserKeyTick == 0, HotkeyService.LastUserKeyTick.ToString());
+            Dn(h, 'A'); Up(h, 'A');
+            Check("Typing a letter counts as typing", HotkeyService.LastUserKeyTick > 0, HotkeyService.LastUserKeyTick.ToString());
+            long t0 = HotkeyService.LastUserKeyTick; Hold(20);
+            Dn(h, VK_LSHIFT); Up(h, VK_LSHIFT);
+            Check("A modifier alone does not count as typing", HotkeyService.LastUserKeyTick == t0, HotkeyService.LastUserKeyTick.ToString());
             h = New("Ctrl+Win"); Dn(h, VK_LCONTROL); Dn(h, 'Z'); Up(h, 'Z'); Up(h, VK_LCONTROL);
             Check("Ctrl+Z (undo) is left alone", events.Count == 0, Ev());
 

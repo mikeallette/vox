@@ -31,6 +31,12 @@ public sealed class AppSettings
         };
     [JsonIgnore] public KeyCombo PasteLastCombo => KeyCombo.Parse(PasteLastKeys) ?? KeyCombo.DefaultPasteLast;
     [JsonIgnore] public KeyCombo CopyLastCombo => KeyCombo.Parse(CopyLastKeys) ?? KeyCombo.DefaultCopyLast;
+    public string RehearKeys { get; set; } = "";         // re-hear the last dictation in accurate mode ("" = Alt+Shift+R)
+    [JsonIgnore] public KeyCombo RehearCombo => KeyCombo.Parse(RehearKeys) ?? KeyCombo.DefaultRehear;
+    // apps (process names) that always use accurate mode when a .gguf model is installed: classic Outlook, new
+    // Outlook, Word. Longer writing, where a few seconds' wait matters less than the words.
+    public List<string> AccurateApps { get; set; } = new() { "OUTLOOK", "olk", "WINWORD" };
+    public bool PrivateMode { get; set; } = false;       // nothing saved to history or audio while on
     public InsertMethod Insert { get; set; } = InsertMethod.Paste;
     public bool LiveTranscribe { get; set; } = true;     // transcribe finished phrases while still speaking
     // accurate mode: pass dictionary words to Qwen3 as hints. Off by default: on 25 read sentences they fixed 3 words,

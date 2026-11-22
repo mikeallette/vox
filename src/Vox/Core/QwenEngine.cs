@@ -11,7 +11,7 @@ namespace Vox.Core;
 /// program, so the model runs in a helper copy of Vox (Vox.exe --asr-host) that this class starts and talks to over a
 /// pipe. Nothing touches the network. If the helper stops, it is started again on the next dictation.
 /// Measured 2026-11-11 on 25 read-aloud test sentences (fair test): about 3 points more words right than Parakeet v3,
-/// about 3 times slower on the i7-7700HQ.
+/// about 3 times slower on a 4-core laptop CPU from 2017.
 /// </summary>
 public sealed class QwenEngine : ISpeechEngine
 {

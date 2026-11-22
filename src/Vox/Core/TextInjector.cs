@@ -66,6 +66,35 @@ public sealed class TextInjector
         await Task.Delay(30);
     }
 
+    /// <summary>
+    /// Presses Enter for "press enter". Waits for Ctrl/Win/Alt/Shift to come up first: a held Ctrl would make it Ctrl+Enter,
+    /// which sends the email in Outlook. False when the focused window runs as administrator (Windows drops the key).
+    /// </summary>
+    public static async Task<bool> PressEnterAsync()
+    {
+        if (ForegroundIsElevatedAboveUs()) return false;
+        await WaitForModifiersReleased();
+        Send(Key(0x0D, false), Key(0x0D, true));
+        return true;
+    }
+
+    /// <summary>Deletes Vox's own last text before the caret (one Backspace per visible character), in batches so slow
+    /// apps keep up.</summary>
+    public static async Task BackspaceAsync(string deleted)
+    {
+        int n = new System.Globalization.StringInfo(deleted).LengthInTextElements;
+        await WaitForModifiersReleased();
+        while (n > 0)
+        {
+            int k = Math.Min(n, 40);
+            var inputs = new List<INPUT>();
+            for (int i = 0; i < k; i++) { inputs.Add(Key(0x08, false)); inputs.Add(Key(0x08, true)); }
+            Send(inputs.ToArray());
+            n -= k;
+            await Task.Delay(15);
+        }
+    }
+
     static void TypeText(string text)
     {
         var inputs = new List<INPUT>();

@@ -20,6 +20,7 @@ public sealed class KeyCombo : IEquatable<KeyCombo>
     public static KeyCombo DefaultDictation => Parse("Ctrl+Win")!;
     public static KeyCombo DefaultPasteLast => Parse("Alt+Shift+Z")!;
     public static KeyCombo DefaultCopyLast => Parse("Alt+Shift+X")!;
+    public static KeyCombo DefaultRehear => Parse("Alt+Shift+R")!;
 
     public bool IsEmpty => !Ctrl && !Alt && !Shift && !Win && Keys.Length == 0;
     public bool IsModifierOnly => Keys.Length == 0;

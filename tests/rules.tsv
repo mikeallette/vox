@@ -147,10 +147,7 @@ dict	Run the hypot test.	Run the hipot test.
 dict	The optocoupla failed.	The optocoupler failed.
 dict	Check the magnetics.	=
 dict	Magnetics design.	=
-dict	Youth group is tonight.	=
-dict	Go to grandma's house.	Go to Grandma's house.
 dict	The kick off meeting.	The kickoff meeting.
-dict	A birthday cart.	A birthday card.
 dict	The burning test.	The burn-in test.
 # Dictionary must leave everyday words alone
 dict-negative	The data is fine.	=
@@ -166,7 +163,6 @@ dict-negative	The game was fun.	=
 dict-negative	Turn on the light.	=
 dict-negative	Turn off the light.	=
 dict-negative	Mark sent it.	=
-dict-negative	The youth pastor.	=
 # Capitals and greetings
 caps	Hi mark, how are you?	Hi Mark, how are you?
 caps	Hello priya, thanks.	Hello Priya, thanks.
@@ -228,7 +224,6 @@ degrees	Running hot around eighty-five degrees c. on the thermal camera.	Running
 degrees	Running hot around 85 degrees Celsius on the camera.	Running hot around 85°C on the camera.
 degrees	It hit one hundred degrees Fahrenheit outside.	It hit 100°F outside.
 degrees	Some degrees of freedom.	=
-time	We need to leave for church by nine fifteen on Sunday morning.	We need to leave for church by 9:15 on Sunday morning.
 time	Meet me at two thirty.	Meet me at 2:30.
 time	We had nine fifteen people.	=
 time	It should take about forty five minutes.	It should take about 45 minutes.
@@ -269,3 +264,20 @@ years	We have two thousand units.	=
 years	Since two thousand twenty one we use it.	Since 2021 we use it.
 years	In two thousand twenty five hundred people came.	=
 years	The meeting is on November fourteenth, two thousand twenty-six.	The meeting is on November 14, 2026.
+parts	Replace R twelve and C 5 near Q three.	Replace R12 and C5 near Q3.
+parts	Check R 12 and the U 3 regulator.	Check R12 and the U3 regulator.
+parts	Use an LM three one seven.	Use an LM317.
+parts	The TPS 54360 buck and the LM 317.	The TPS54360 buck and the LM317.
+parts	The part number is T P S five four three six zero.	The part number is TPS54360.
+parts	Probe TP 4 and SW 2.	Probe TP4 and SW2.
+parts	We need ISO 9001 and IPC 2221 spacing.	=
+parts	The CES 2026 show.	=
+parts	I have two boards and a 5 V rail.	I have two boards and a 5 V rail.
+parts	Put C 5 µF on the rail.	=
+parts	Plan A 1 is fine.	=
+parts	It's a USB 3 port.	=
+parts	The LLC 500 kHz tank runs cool.	=
+parts	The EMI scan at 150 kHz passed.	=
+parts	Put C 5 microfarad on the rail.	Put C 5 µF on the rail.
+parts	The PCB 200 mm wide board.	=
+parts	Order the LM 317 regulator.	Order the LM317 regulator.

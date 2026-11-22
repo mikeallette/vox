@@ -15,12 +15,43 @@ public sealed class Services
     public AppSettings Settings = null!;
     public DataStore Data = null!;
     public SpeechEngine Engine = new();
+    /// <summary>Second engine for per-app accurate mode and "re-hear": loaded the first time it's needed, then kept.</summary>
+    public SpeechEngine AccurateEngine = new();
+    Task<SpeechEngine?>? _accurateLoad;
     public DictationController Dictation = null!;
+
+    /// <summary>The accurate-mode model (.gguf) in the app or data folder, if one is installed. Looked up once and again
+    /// whenever the model list may have changed (RefreshAccurateModel), not on every dictation.</summary>
+    public FileInfo? AccurateModel { get; private set; }
+    public void RefreshAccurateModel() => AccurateModel = QwenEngine.IsAvailable
+        ? Data.FindModels(AppContext.BaseDirectory).Where(f => QwenEngine.IsGgufModel(f.Name)).OrderBy(f => f.Length).FirstOrDefault() : null;
+
+    public Task<SpeechEngine?> GetAccurateEngineAsync()
+    {
+        if (Engine.WantsWholeClip) return Task.FromResult<SpeechEngine?>(Engine);   // the main model already is accurate mode
+        lock (this)
+        {
+            if (_accurateLoad is { IsFaulted: false }) return _accurateLoad;
+            var m = AccurateModel;
+            if (m == null) return Task.FromResult<SpeechEngine?>(null);
+            _accurateLoad = Task.Run(async () => { await AccurateEngine.LoadAsync(m.FullName); return (SpeechEngine?)AccurateEngine; });
+            return _accurateLoad;
+        }
+    }
     public MeetingRecorder Meeting = null!;
     public HotkeyService Hotkeys = null!;
     public VoxBar Bar = null!;
     public bool ModelLoading, Quitting;
     public event Action? ModelChanged;
+    public event Action? PrivateModeChanged;
+
+    public void SetPrivateMode(bool on)
+    {
+        if (Settings.PrivateMode == on) return;
+        Settings.PrivateMode = on; Settings.Save();
+        Log.Info($"private mode {(on ? "on" : "off")}");
+        PrivateModeChanged?.Invoke();
+    }
     public Action? OnMeetingChanged;
 
     public bool AnyModelAvailable => Data.FindModels(AppContext.BaseDirectory).Any();
@@ -40,6 +71,7 @@ public sealed class Services
 
     public async Task LoadModelAsync()
     {
+        RefreshAccurateModel();   // the model list may have changed (startup, import, new choice)
         var m = PickModel();
         if (m == null) { Log.Info("no speech model found in the app or data folder; waiting for the user to add one"); ModelChanged?.Invoke(); return; }
         ModelLoading = true; ModelChanged?.Invoke();
@@ -57,6 +89,7 @@ public sealed class Services
         Hotkeys.Dictation = Settings.DictationCombo;
         Hotkeys.PasteLast = Settings.PasteLastCombo;
         Hotkeys.CopyLast = Settings.CopyLastCombo;
+        Hotkeys.Rehear = Settings.RehearCombo;
         Bar.AlwaysVisible = Settings.ShowVoxBarAlways;
         Bar.SetState(Dictation.State, "");
         SetAutostart(Settings.LaunchAtLogin);
@@ -127,6 +160,7 @@ public partial class App : System.Windows.Application
         if (e.Args.Length >= 4 && e.Args[0] == "--level-test") { try { Trainer.LevelTest(e.Args); } catch (Exception ex) { File.WriteAllText(e.Args[1] + ".error.txt", ex.ToString()); } Shutdown(); return; }
         if (e.Args.Length >= 4 && e.Args[0] == "--score") { try { Trainer.ScoreFiles(e.Args); } catch (Exception ex) { File.WriteAllText(e.Args[1] + ".error.txt", ex.ToString()); } Shutdown(); return; }
         if (e.Args.Length >= 6 && e.Args[0] == "--chunk-speed") { await Trainer.ChunkSpeedAsync(e.Args); Shutdown(); return; }
+        if (e.Args.Length >= 2 && e.Args[0] == "--feature-tests") { try { Trainer.FeatureTests(e.Args); } catch (Exception ex) { File.WriteAllText(e.Args[1] + ".error.txt", ex.ToString()); } Shutdown(); return; }
         if (e.Args.Length >= 6 && e.Args[0] == "--model-bench") { try { await Trainer.ModelBenchAsync(e.Args); } catch (Exception ex) { File.WriteAllText(Path.Combine(e.Args[1], "error.txt"), ex.ToString()); } Shutdown(); return; }
         if (e.Args.Length >= 5 && e.Args[0] == "--live-replay") { try { await Trainer.LiveReplayAsync(e.Args); } catch (Exception ex) { File.WriteAllText(e.Args[1] + ".error.txt", ex.ToString()); } Shutdown(); return; }
         if (e.Args.Length >= 4 && e.Args[0] == "--qa-audio") { await Trainer.QaAudioAsync(e.Args); Shutdown(); return; }
@@ -180,13 +214,15 @@ public partial class App : System.Windows.Application
         s.Bar = new VoxBar { AlwaysVisible = s.Settings.ShowVoxBarAlways };
         s.Dictation = new DictationController(s.Settings, s.Data, s.Engine);
         s.Meeting = new MeetingRecorder(s.Settings, s.Data, s.Engine);
-        s.Hotkeys = new HotkeyService(System.Threading.SynchronizationContext.Current!) { Dictation = s.Settings.DictationCombo, PasteLast = s.Settings.PasteLastCombo, CopyLast = s.Settings.CopyLastCombo };
+        s.Hotkeys = new HotkeyService(System.Threading.SynchronizationContext.Current!) { Dictation = s.Settings.DictationCombo, PasteLast = s.Settings.PasteLastCombo, CopyLast = s.Settings.CopyLastCombo, Rehear = s.Settings.RehearCombo };
+        s.Dictation.GetAccurateEngine = s.GetAccurateEngineAsync;
+        s.Dictation.AccurateAvailable = () => s.AccurateModel != null;
 
         s.Dictation.StateChanged += (st, msg) =>
         {
             s.Bar.SetState(st, msg);
             if (st != VoxState.Listening) s.Hotkeys.ResetState();
-            if (_tray != null) _tray.Text = st == VoxState.Listening ? "Vox - listening" : "Vox";
+            if (_tray != null) _tray.Text = st == VoxState.Listening ? "Vox - listening" : s.Settings.PrivateMode ? "Vox (private mode)" : "Vox";
         };
         s.Dictation.Level += l => s.Bar.Dispatcher.BeginInvoke(() => s.Bar.PushLevel(l));
         s.Hotkeys.DictationStarted += m => s.Dictation.Start(m);
@@ -194,6 +230,7 @@ public partial class App : System.Windows.Application
         s.Hotkeys.DictationCancelled += silent => s.Dictation.Cancel(silent);
         s.Hotkeys.PasteLastRequested += () => _ = s.Dictation.PasteLastAsync();
         s.Hotkeys.CopyLastRequested += () => s.Dictation.CopyLast();
+        s.Hotkeys.RehearRequested += () => _ = s.Dictation.RehearLastAsync();
 
         _main = new MainWindow(s);
         BuildTray(s);
@@ -244,11 +281,26 @@ public partial class App : System.Windows.Application
         _pauseItem = new WinForms.ToolStripMenuItem("Pause shortcut") { CheckOnClick = true };
         _pauseItem.CheckedChanged += (_, _) => s.Hotkeys.Enabled = !_pauseItem.Checked;
         menu.Items.Add(_pauseItem);
+        // private mode: dictations still type, but nothing is saved to history or audio (for anything sensitive)
+        var privateItem = new WinForms.ToolStripMenuItem("Private mode (save no history)") { CheckOnClick = true, Checked = s.Settings.PrivateMode };
+        privateItem.CheckedChanged += (_, _) => s.SetPrivateMode(privateItem.Checked);
+        s.PrivateModeChanged += () =>
+        {
+            privateItem.Checked = s.Settings.PrivateMode;
+            if (_tray != null) _tray.Text = s.Settings.PrivateMode ? "Vox (private mode)" : "Vox";
+        };
+        menu.Items.Add(privateItem);
+        menu.Items.Add("Open notes", null, (_, _) =>
+        {
+            var notes = Path.Combine(s.Data.Root, "Notes.md");
+            if (!File.Exists(notes)) File.WriteAllText(notes, "# Notes to self\n\nSay \"note to self\" and then your note.\n\n");
+            Process.Start(new ProcessStartInfo(notes) { UseShellExecute = true });
+        });
         menu.Items.Add("Open data folder", null, (_, _) => Process.Start(new ProcessStartInfo(s.Data.Root) { UseShellExecute = true }));
         menu.Items.Add(new WinForms.ToolStripSeparator());
         menu.Items.Add("Quit Vox", null, async (_, _) => await QuitAsync());
 
-        _tray = new WinForms.NotifyIcon { Icon = IconMaker.Make(32), Visible = true, Text = "Vox", ContextMenuStrip = menu };
+        _tray = new WinForms.NotifyIcon { Icon = IconMaker.Make(32), Visible = true, Text = s.Settings.PrivateMode ? "Vox (private mode)" : "Vox", ContextMenuStrip = menu };
         _tray.DoubleClick += (_, _) => ShowMain();
     }
 
@@ -259,6 +311,7 @@ public partial class App : System.Windows.Application
         _svc.Hotkeys.Dispose();
         _tray!.Visible = false; _tray.Dispose();
         _svc.Engine.Dispose();
+        _svc.AccurateEngine.Dispose();
         Shutdown();
     }
 }

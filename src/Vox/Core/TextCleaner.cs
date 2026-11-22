@@ -89,7 +89,7 @@ public static class TextCleaner
         }
 
         bool newRules = !OldRulesForTesting;
-        if (s.FormatNumbers && newRules) t = NumberFormat.Apply(t);
+        if (s.FormatNumbers && newRules) t = NumberFormat.Apply(PartNumbers.Apply(t));
         t = ClockTime.Replace(t, m => $"{m.Groups[1].Value.TrimStart('0')}:{m.Groups[2].Value} {char.ToLowerInvariant(m.Groups[3].Value[0])}.m.");
         t = HourTime.Replace(t, m => $"{m.Groups[1].Value} {char.ToLowerInvariant(m.Groups[2].Value[0])}.m.");
         t = GluedUnit.Replace(t, "$1 $2");

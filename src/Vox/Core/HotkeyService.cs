@@ -22,6 +22,11 @@ public sealed class HotkeyService : IDisposable
     public event Action<bool>? DictationCancelled;     // true = silent (it was just a tap)
     public event Action? PasteLastRequested;
     public event Action? CopyLastRequested;
+    public event Action? RehearRequested;
+
+    /// <summary>When the user last pressed a non-modifier key that wasn't a Vox shortcut (Environment.TickCount64).
+    /// Vox only deletes or replaces its last dictation when nothing was typed after it.</summary>
+    public static long LastUserKeyTick;
 
     readonly SynchronizationContext _ui;
     readonly bool[] _down = new bool[256];
@@ -39,6 +44,7 @@ public sealed class HotkeyService : IDisposable
     public KeyCombo Dictation { get; set; } = KeyCombo.DefaultDictation;
     public KeyCombo PasteLast { get; set; } = KeyCombo.DefaultPasteLast;
     public KeyCombo CopyLast { get; set; } = KeyCombo.DefaultCopyLast;
+    public KeyCombo Rehear { get; set; } = KeyCombo.DefaultRehear;
     public bool Enabled { get; set; } = true;
 
     /// <summary>Where modifier state is re-read from (the OS normally; the self-test supplies its own).</summary>
@@ -145,17 +151,23 @@ public sealed class HotkeyService : IDisposable
         int vk = (int)k.vkCode;
         if (vk is < 0 or > 255) return CallNextHookEx(_hook, nCode, wParam, lParam);
 
-        try
-        {
-            if (_capture != null) { if (HandleCapture(vk, isDown, isUp)) return (IntPtr)1; }
-            else if (Enabled && Handle(vk, isDown, isUp)) return (IntPtr)1; // swallow
-        }
+        try { if (Process(vk, isDown, isUp)) return (IntPtr)1; }   // swallow
         catch (Exception ex) { Log.Error("hook", ex); }
         return CallNextHookEx(_hook, nCode, wParam, lParam);
     }
 
+    /// <summary>One real key event: shortcut handling plus the "user typed something" time. True = swallow it.</summary>
+    bool Process(int vk, bool isDown, bool isUp)
+    {
+        long before = LastUserKeyTick;
+        if (isDown && !KeyCombo.IsModifierKey(vk)) LastUserKeyTick = Environment.TickCount64;   // typed something
+        bool swallow = _capture != null ? HandleCapture(vk, isDown, isUp) : Enabled && Handle(vk, isDown, isUp);
+        if (swallow) LastUserKeyTick = before;                                                 // a Vox shortcut, not typing
+        return swallow;
+    }
+
     /// <summary>Test entry: one key event as the hook would see it. Returns true when Vox would swallow it.</summary>
-    internal bool Feed(int vk, bool isDown) => _capture != null ? HandleCapture(vk, isDown, !isDown) : Handle(vk, isDown, !isDown);
+    internal bool Feed(int vk, bool isDown) => Process(vk, isDown, !isDown);
 
     static readonly int[] Modifiers = { VK_LSHIFT, VK_RSHIFT, VK_LCONTROL, VK_RCONTROL, VK_LMENU, VK_RMENU, VK_LWIN, VK_RWIN };
 
@@ -205,7 +217,7 @@ public sealed class HotkeyService : IDisposable
         // ----- Paste / copy last transcript (fire on the shortcut's last key going down) -----
         if (isDown && !KeyCombo.IsModifierKey(vk))
         {
-            foreach (var (combo, act) in new (KeyCombo, Action)[] { (PasteLast, () => PasteLastRequested?.Invoke()), (CopyLast, () => CopyLastRequested?.Invoke()) })
+            foreach (var (combo, act) in new (KeyCombo, Action)[] { (PasteLast, () => PasteLastRequested?.Invoke()), (CopyLast, () => CopyLastRequested?.Invoke()), (Rehear, () => RehearRequested?.Invoke()) })
             {
                 if (combo.IsModifierOnly || !combo.Keys.Contains(vk) || combo.Equals(dict) || !combo.IsHeld(Down)) continue;
                 if (!wasDown) Post(act);

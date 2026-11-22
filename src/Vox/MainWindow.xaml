@@ -83,6 +83,7 @@
                                         <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="14.5" Margin="0,5,0,0" LineHeight="21"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="12,0,0,0">
+                                        <Button Content="Fix..." Style="{StaticResource GhostButton}" Padding="10,4" Margin="0,0,6,0" Tag="{Binding}" Click="FixEntry_Click" ToolTip="Correct this text and teach Vox the words it got wrong"/>
                                         <Button Content="Copy" Style="{StaticResource GhostButton}" Padding="10,4" Tag="{Binding}" Click="CopyEntry_Click"/>
                                         <Button Content="Delete" Style="{StaticResource GhostButton}" Padding="10,4" Margin="6,0,0,0" Tag="{Binding}" Click="DeleteEntry_Click"/>
                                     </StackPanel>
@@ -198,6 +199,9 @@
                     </DockPanel>
                     <TextBlock Style="{StaticResource Sub}" Margin="0,4,0,0" TextWrapping="Wrap" Text="Fast (Parakeet) types in about a second. Accurate mode (Qwen3-ASR, a .gguf file) heard about 3% more words right in testing but takes 2 to 4 times longer. Switch any time."/>
                     <CheckBox x:Name="ChkHints" Content="Accurate mode: listen for my dictionary words (slower; mixed results in testing)" Margin="0,6,0,0" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <TextBlock Text="Always use accurate mode in these apps" Margin="0,10,0,4"/>
+                    <TextBox x:Name="AccurateAppsBox" Padding="8,6" LostFocus="Setting_Changed" ToolTip="Program names, separated by commas"/>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,4,0,0" TextWrapping="Wrap" Text="Program names, separated by commas (OUTLOOK and olk are classic and new Outlook, WINWORD is Word). Other apps keep the fast model. Needs an accurate-mode (.gguf) model; the first use loads it, which takes a few seconds."/>
 
                     <TextBlock Text="Microphone" Style="{StaticResource Label}"/>
                     <ComboBox x:Name="MicCombo" Padding="8,6" SelectionChanged="Setting_Changed"/>
@@ -210,7 +214,7 @@
                     <TextBlock Style="{StaticResource Sub}" Margin="0,0,0,6" TextWrapping="Wrap" Text="Click Change, then press the keys you want together and let go. Any mix of Ctrl, Alt, Shift and Win with up to two other keys works (for example Ctrl + Win, Ctrl + Alt, F9, Ctrl + Shift + Space). Esc cancels."/>
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="190"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="Hold to dictate" VerticalAlignment="Center"/>
                         <TextBox x:Name="KeysDictation" Grid.Row="0" Grid.Column="1" IsReadOnly="True" Padding="8,6" Margin="0,3" FontFamily="Segoe UI Semibold"/>
                         <Button Grid.Row="0" Grid.Column="2" Content="Change..." Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="dictation" Click="ChangeKeys_Click"/>
@@ -223,6 +227,10 @@
                         <TextBox x:Name="KeysCopy" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Padding="8,6" Margin="0,3" FontFamily="Segoe UI Semibold"/>
                         <Button Grid.Row="2" Grid.Column="2" Content="Change..." Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="copy" Click="ChangeKeys_Click"/>
                         <Button Grid.Row="2" Grid.Column="3" Content="Default" Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="copy" Click="DefaultKeys_Click"/>
+                        <TextBlock Grid.Row="3" Text="Re-hear last in accurate mode" VerticalAlignment="Center"/>
+                        <TextBox x:Name="KeysRehear" Grid.Row="3" Grid.Column="1" IsReadOnly="True" Padding="8,6" Margin="0,3" FontFamily="Segoe UI Semibold"/>
+                        <Button Grid.Row="3" Grid.Column="2" Content="Change..." Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="rehear" Click="ChangeKeys_Click"/>
+                        <Button Grid.Row="3" Grid.Column="3" Content="Default" Style="{StaticResource GhostButton}" Margin="8,3,0,3" Tag="rehear" Click="DefaultKeys_Click"/>
                     </Grid>
                     <TextBlock x:Name="HotkeyHelp" Style="{StaticResource Sub}" Margin="0,4,0,0" TextWrapping="Wrap"/>
 
@@ -238,11 +246,12 @@
                     <CheckBox x:Name="ChkTrailing" Content="Add a space after each dictation" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkFillers" Content="Remove filler sounds (um, uh, hmm)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkNumbers" Content="Write numbers and units like an engineer (48 V, 8 A, 250 kHz, 10 kΩ, 8:10 p.m.)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                    <CheckBox x:Name="ChkCommands" Content="Spoken commands: say 'new line' or 'new paragraph'" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkCommands" Content="Spoken commands: 'new line', 'new paragraph', 'scratch that', '... press enter', 'note to self ...', 'calculate ...'" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkVoxBar" Content="Show the Vox bar at all times" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkLaunch" Content="Start Vox when I sign in to Windows" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkHistory" Content="Keep dictation history" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkAudio" Content="Also keep the audio of each dictation (uses disk space)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkPrivate" Content="Private mode: save nothing to history or audio (also in the tray menu)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkSysAudio" Content="Meetings: include system audio (Teams, Zoom, Meet)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
 
                     <TextBlock Text="Meeting audio from" Style="{StaticResource Label}"/>
@@ -255,6 +264,13 @@
                         <Button DockPanel.Dock="Right" Content="Install speaker models..." Style="{StaticResource GhostButton}" Click="ImportSpeakerModels_Click" Margin="8,0,0,0" VerticalAlignment="Top"/>
                         <TextBlock x:Name="SpeakerModelStatus" Style="{StaticResource Sub}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                     </DockPanel>
+
+                    <TextBlock Text="Move to another PC" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Export settings and dictionary..." Style="{StaticResource GhostButton}" Click="ExportSettings_Click" Margin="0,0,8,0"/>
+                        <Button Content="Import..." Style="{StaticResource GhostButton}" Click="ImportSettings_Click"/>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,4,0,0" TextWrapping="Wrap" Text="One file with your dictionary, snippets and settings. History, the data folder, microphone and model choice stay on each PC. Importing only adds; the current files are backed up first."/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,22,0,30">
                         <Button Content="Open log file" Style="{StaticResource GhostButton}" Click="OpenLog_Click" Margin="0,0,8,0"/>

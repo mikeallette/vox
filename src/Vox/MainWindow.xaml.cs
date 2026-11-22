@@ -39,6 +39,7 @@ public partial class MainWindow : Window
 
         S.Dictation.StateChanged += (_, _) => Dispatcher.Invoke(RefreshStatus);
         S.ModelChanged += () => Dispatcher.Invoke(() => { RefreshStatus(); PopulateModels(); });
+        S.PrivateModeChanged += () => Dispatcher.Invoke(() => { bool was = _loading; _loading = true; ChkPrivate.IsChecked = S.Settings.PrivateMode; _loading = was; });
         S.Meeting.Status += m => Dispatcher.Invoke(() => MeetingStatus.Text = m);
         S.Meeting.LineAdded += (who, text) => Dispatcher.Invoke(() =>
         {
@@ -194,6 +195,7 @@ public partial class MainWindow : Window
         KeysDictation.Text = S.Settings.DictationCombo.ToString();
         KeysPaste.Text = S.Settings.PasteLastCombo.ToString();
         KeysCopy.Text = S.Settings.CopyLastCombo.ToString();
+        KeysRehear.Text = S.Settings.RehearCombo.ToString();
         HotkeyHelp.Text = $"Hands-free: press Space while holding {S.Settings.DictationCombo}, or double-tap it. Shortcuts work in every app, even when this window is closed.";
         HintText.Text = HotkeyHints();
     }
@@ -205,7 +207,7 @@ public partial class MainWindow : Window
         var btn = (Button)sender;
         if (_capturingButton != null) { S.Hotkeys.CancelCapture(); return; }
         string which = (string)btn.Tag;
-        var box = which switch { "paste" => KeysPaste, "copy" => KeysCopy, _ => KeysDictation };
+        var box = which switch { "paste" => KeysPaste, "copy" => KeysCopy, "rehear" => KeysRehear, _ => KeysDictation };
         _capturingButton = btn;
         btn.Content = "Cancel";
         box.Text = "Press the keys now...";
@@ -216,7 +218,7 @@ public partial class MainWindow : Window
             if (combo != null)
             {
                 var problem = combo.Problem();
-                var others = new (string Name, KeyCombo Combo)[] { ("dictation", S.Settings.DictationCombo), ("paste", S.Settings.PasteLastCombo), ("copy", S.Settings.CopyLastCombo) }
+                var others = new (string Name, KeyCombo Combo)[] { ("dictation", S.Settings.DictationCombo), ("paste", S.Settings.PasteLastCombo), ("copy", S.Settings.CopyLastCombo), ("rehear", S.Settings.RehearCombo) }
                     .Where(o => o.Name != which && o.Combo.Equals(combo)).ToList();
                 if (problem == null && others.Count > 0) problem = $"{combo} is already used for another Vox shortcut.";
                 if (problem != null) MessageBox.Show(this, problem, "Shortcut not changed", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -230,7 +232,7 @@ public partial class MainWindow : Window
     {
         if (_capturingButton != null) S.Hotkeys.CancelCapture();
         string which = (string)((Button)sender).Tag;
-        var def = which switch { "paste" => KeyCombo.DefaultPasteLast, "copy" => KeyCombo.DefaultCopyLast, _ => KeyCombo.DefaultDictation };
+        var def = which switch { "paste" => KeyCombo.DefaultPasteLast, "copy" => KeyCombo.DefaultCopyLast, "rehear" => KeyCombo.DefaultRehear, _ => KeyCombo.DefaultDictation };
         SaveKeys(which, def.Serialize());
         ShowKeys();
     }
@@ -241,6 +243,7 @@ public partial class MainWindow : Window
         {
             case "paste": S.Settings.PasteLastKeys = keys; break;
             case "copy": S.Settings.CopyLastKeys = keys; break;
+            case "rehear": S.Settings.RehearKeys = keys; break;
             default: S.Settings.DictationKeys = keys; break;
         }
         S.Settings.Save();
@@ -337,6 +340,8 @@ public partial class MainWindow : Window
         ChkLaunch.IsChecked = S.Settings.LaunchAtLogin;
         ChkHistory.IsChecked = S.Settings.SaveHistory;
         ChkAudio.IsChecked = S.Settings.KeepAudio;
+        ChkPrivate.IsChecked = S.Settings.PrivateMode;
+        AccurateAppsBox.Text = string.Join(", ", S.Settings.AccurateApps);
         ChkSysAudio.IsChecked = S.Settings.MeetingIncludeSystemAudio;
 
         MeetPlaybackCombo.Items.Clear();
@@ -400,12 +405,75 @@ public partial class MainWindow : Window
         s.LaunchAtLogin = ChkLaunch.IsChecked == true;
         s.SaveHistory = ChkHistory.IsChecked == true;
         s.KeepAudio = ChkAudio.IsChecked == true;
+        s.AccurateApps = AccurateAppsBox.Text.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(a => a.Trim().Replace(".exe", "", StringComparison.OrdinalIgnoreCase)).Where(a => a.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        bool priv = ChkPrivate.IsChecked == true;
         s.MeetingIncludeSystemAudio = ChkSysAudio.IsChecked == true;
         s.MeetingPlayback = TagOf(MeetPlaybackCombo, s.MeetingPlayback);
         s.MeetingSpeakerLabels = ChkSpeakers.IsChecked == true;
         s.Save();
+        S.SetPrivateMode(priv);
         S.ApplySettings(modelChanged);
         HintText.Text = HotkeyHints();
+    }
+
+    // ---------- move to another PC ----------
+    void ExportSettings_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new SaveFileDialog { Title = "Export Vox settings and dictionary", FileName = $"Vox settings {DateTime.Now:yyyy-MM-dd}.json", Filter = "Vox settings (*.json)|*.json" };
+        if (dlg.ShowDialog(this) != true) return;
+        try
+        {
+            SettingsTransfer.Export(dlg.FileName, S.Settings, S.Data);
+            MessageBox.Show(this, $"Saved {S.Data.Dictionary.Count} dictionary entries, {S.Data.Snippets.Count} snippets and your settings to:\n\n{dlg.FileName}\n\nOn the other PC: Settings > Import.", "Vox", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex) { MessageBox.Show(this, "Could not export.\n\n" + ex.Message, "Vox", MessageBoxButton.OK, MessageBoxImage.Warning); }
+    }
+
+    void ImportSettings_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new OpenFileDialog { Title = "Import Vox settings and dictionary", Filter = "Vox settings (*.json)|*.json|All files|*.*" };
+        if (dlg.ShowDialog(this) != true) return;
+        if (MessageBox.Show(this, "Add the dictionary entries and snippets from this file, and use its settings (shortcuts, behavior)?\n\nNothing is deleted, and your current files are backed up first.", "Vox", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        try
+        {
+            var summary = SettingsTransfer.Import(dlg.FileName, S.Settings, S.Data);
+            Log.Info("import: " + summary);
+            PopulateSettings();
+            S.ApplySettings(false);
+            MessageBox.Show(this, summary, "Vox", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex) { MessageBox.Show(this, "Could not import.\n\n" + ex.Message, "Vox", MessageBoxButton.OK, MessageBoxImage.Warning); }
+    }
+
+    // ---------- teach a word from history ----------
+    void FixEntry_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not HistoryEntry h) return;
+        var box = new TextBox { Text = h.Text, TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, MinHeight = 90, Padding = new Thickness(6), FontSize = 14 };
+        var ok = new Button { Content = "Teach Vox", IsDefault = true, Padding = new Thickness(14, 5, 14, 5), Margin = new Thickness(0, 0, 8, 0) };
+        var cancel = new Button { Content = "Cancel", IsCancel = true, Padding = new Thickness(14, 5, 14, 5) };
+        var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 12, 0, 0), Children = { ok, cancel } };
+        var panel = new StackPanel { Margin = new Thickness(16) };
+        panel.Children.Add(new TextBlock { Text = "Change the words Vox got wrong, then click Teach Vox. It will offer each change as a dictionary entry.", TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 8) });
+        panel.Children.Add(box); panel.Children.Add(buttons);
+        var win = new Window { Title = "Fix and teach", Content = panel, Owner = this, Width = 560, SizeToContent = SizeToContent.Height, WindowStartupLocation = WindowStartupLocation.CenterOwner, ResizeMode = ResizeMode.NoResize };
+        ok.Click += (_, _) => win.DialogResult = true;
+        if (win.ShowDialog() != true || box.Text.Trim() == h.Text.Trim()) return;
+
+        var proposals = TeachWords.Propose(h.Text, box.Text);
+        var fresh = proposals.Where(p => !S.Data.Dictionary.Any(d => d.From.Equals(p.From, StringComparison.OrdinalIgnoreCase))).ToList();
+        if (fresh.Count == 0)
+        {
+            TextInjector.SetClipboard(box.Text.Trim());
+            MessageBox.Show(this, proposals.Count == 0 ? "No single-word changes to learn from (only removed words or a rewritten sentence). The fixed text is on the clipboard." : "Those words are already in your dictionary. The fixed text is on the clipboard.", "Vox", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        var list = string.Join("\n", fresh.Select(p => $"   \"{p.From}\"  ->  \"{p.To}\""));
+        if (MessageBox.Show(this, $"Add {(fresh.Count == 1 ? "this entry" : "these entries")} to your dictionary?\n\n{list}\n\nFrom now on Vox will write it the new way. (The fixed text is also copied to the clipboard.)", "Teach Vox", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        foreach (var p in fresh) S.Data.Dictionary.Add(p);
+        S.Data.SaveDictionary();
+        TextInjector.SetClipboard(box.Text.Trim());
+        Log.Info($"teach: added {fresh.Count} dictionary entries from a history fix");
     }
 
     void ImportModel_Click(object sender, RoutedEventArgs e)

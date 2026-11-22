@@ -526,7 +526,10 @@ public sealed class MeetingRecorder
             List<Entry> list;
             lock (_gate) list = _entries.OrderBy(e => e.StartSec).ToList();
             list = DropEchoes(list);
-            var sb = new StringBuilder(Header(_clock.Elapsed));
+            var header = Header(_clock.Elapsed);
+            var actions = ActionItems.Markdown(ActionItems.Find(list.Select(e => (e.StartSec, e.Speaker, e.Text))), Ts);
+            if (actions.Length > 0) header = header.Replace("## Transcript\n\n", actions + "## Transcript\n\n");
+            var sb = new StringBuilder(header);
             foreach (var e in list) sb.Append($"**[{Ts(e.StartSec)}] {e.Speaker}:** {e.Text}\n\n");
             if (list.Count == 0) sb.Append("_No speech was detected._\n");
             File.WriteAllText(FilePath!, sb.ToString(), new UTF8Encoding(true));
@@ -576,9 +579,15 @@ public sealed class MeetingRecorder
         var updated = LineRx.Replace(text, m =>
             renames.TryGetValue(m.Groups[2].Value, out var to) && !string.IsNullOrWhiteSpace(to)
                 ? $"**[{m.Groups[1].Value}] {to.Trim().Replace("*", "").Replace(":", "")}:**" : m.Value);
+        // and the names in the action-item list: "_(Speaker 1, 00:12:04)_"
+        updated = ActionRx.Replace(updated, m =>
+            renames.TryGetValue(m.Groups[1].Value, out var to) && !string.IsNullOrWhiteSpace(to)
+                ? $"_({to.Trim().Replace("*", "").Replace(",", "")}, {m.Groups[2].Value})_" : m.Value);
         if (updated != text) AtomicFile.WriteAllText(mdPath, updated);
     }
 
+    static readonly System.Text.RegularExpressions.Regex ActionRx =
+        new(@"_\(([^,()\n]+), (\d\d:\d\d:\d\d)\)_", System.Text.RegularExpressions.RegexOptions.Compiled);
     static readonly System.Text.RegularExpressions.Regex LineRx =
         new(@"\*\*\[(\d\d:\d\d:\d\d)\] ([^*\n:]+):\*\*", System.Text.RegularExpressions.RegexOptions.Compiled);
 }
