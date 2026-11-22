@@ -124,7 +124,7 @@ internal static class NumberFormat
         });
         t = Percent.Replace(t, "$1%");
         t = Dollars.Replace(t, "$$$1");
-        // Degrees as symbols, the way engineering notes and Wispr Flow write them (script read 2026-11-11):
+        // Degrees as symbols, the way engineering notes write them (script read 2026-11-11):
         // "85 degrees Celsius" / "85 degrees c" / "105 degreC" -> "85°C", "55 degrees of phase margin" -> "55°"
         t = GluedDegrees.Replace(t, "$1°C");
         t = DegreesUnit.Replace(t, m => m.Groups[1].Value + "°" + (char.ToUpperInvariant(m.Groups[2].Value[0]) == 'F' ? "F" : "C"));

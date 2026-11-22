@@ -1,0 +1,13 @@
+NVIDIA Parakeet TDT 0.6B v3
+
+Model: parakeet-tdt-0.6b-v3, created by NVIDIA.
+Source: https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+         https://creativecommons.org/licenses/by/4.0/legalcode
+
+Changes: Vox uses the ggml q8_0 quantization of this model published by ggml-org
+(https://huggingface.co/ggml-org/parakeet-GGUF). The model was quantized (stored with fewer bits);
+no other changes were made.
+
+No endorsement by NVIDIA is implied. The model is provided "as is", without warranties of any kind,
+as stated in the license.

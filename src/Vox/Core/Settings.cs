@@ -40,7 +40,7 @@ public sealed class AppSettings
     public bool RemoveFillers { get; set; } = true;
     public bool FormatNumbers { get; set; } = true;      // "forty eight volts" -> "48 V", "8 10 pm" -> "8:10 p.m."
     public bool VoiceCommands { get; set; } = true;
-    public bool ShowFlowBarAlways { get; set; } = true;
+    public bool ShowVoxBarAlways { get; set; } = true;
     public bool LaunchAtLogin { get; set; } = false;
     public bool SaveHistory { get; set; } = true;
     public bool KeepAudio { get; set; } = false;         // save each dictation's WAV next to history

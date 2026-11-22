@@ -222,7 +222,7 @@ dict-negative	I used my Google sign-in for this.	=
 dict	I'm setting up the dual factor authentication.	I'm setting up the two-factor authentication.
 dict	Turn on two factor authentication.	Turn on two-factor authentication.
 dict-negative	Two-factor authentication is on.	=
-# Script read 2026-11-11 (25 sentences read aloud; Wispr Flow's formatting taken as the target)
+# Script read 2026-11-11 (25 sentences read aloud; target is the hand-checked text)
 degrees	The plot shows about fifty-five degrees of phase margin and a two-kHz crossover.	The plot shows about 55° of phase margin and a 2 kHz crossover.
 degrees	Running hot around eighty-five degrees c. on the thermal camera.	Running hot around 85°C on the thermal camera.
 degrees	Running hot around 85 degrees Celsius on the camera.	Running hot around 85°C on the camera.
@@ -241,7 +241,7 @@ period	See you at 9 a.m. on Tuesday.	=
 period	Use a resistor, e.g. the 10 kΩ one.	=
 period	It works. Then we ship it.	=
 commands	New paragraph. Let me know if you have any questions.	\n\nLet me know if you have any questions.
-# Repeated words and short restarts (2026-11-11: stutters Vox missed and Wispr Flow cleaned)
+# Repeated words and short restarts (2026-11-11: stutters Vox missed at first)
 restart	So the two-factor authentication authentication on my Google sign-in.	So the two-factor authentication on my Google sign-in.
 restart	Check the the waveform waveform on the scope.	Check the waveform on the scope.
 restart	The resistor, resistor value is wrong.	The resistor value is wrong.

@@ -5,7 +5,7 @@ namespace Vox.Core;
 /// <summary>
 /// Vox.exe --score outFile refs.tsv hyp.tsv [hyp2.tsv ...]
 /// Scores text files (id &lt;tab&gt; text) against references with the same word scoring as every other Vox test.
-/// Used to measure the local language-model cleanup (tools\LlmPolish) against Wispr Flow's text.
+/// Used to measure the local language-model cleanup (tools\LlmPolish) against hand-checked reference text.
 /// </summary>
 internal static partial class Trainer
 {

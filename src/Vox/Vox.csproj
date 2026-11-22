@@ -11,7 +11,7 @@
     <RootNamespace>Vox</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\vox.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Mike Allette</Authors>
     <Company>Vox</Company>
     <Copyright>Copyright (c) 2026 Mike Allette. MIT License.</Copyright>
@@ -42,6 +42,8 @@
     <!-- Accurate mode: transcribe.cpp v0.4.1 prebuilt (MIT, CPU+Vulkan lane), copied to <app>\asr\ ; runs in a helper process -->
     <None Include="..\..\vendor\asr\**\*" Link="asr\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\vendor\speakers\*" Link="models\speakers\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- License texts for the bundled third-party parts (see licenses\README.txt), copied to <app>\licenses\ -->
+    <None Include="..\..\licenses\*" Link="licenses\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

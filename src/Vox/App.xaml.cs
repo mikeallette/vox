@@ -18,7 +18,7 @@ public sealed class Services
     public DictationController Dictation = null!;
     public MeetingRecorder Meeting = null!;
     public HotkeyService Hotkeys = null!;
-    public FlowBar Bar = null!;
+    public VoxBar Bar = null!;
     public bool ModelLoading, Quitting;
     public event Action? ModelChanged;
     public Action? OnMeetingChanged;
@@ -57,7 +57,7 @@ public sealed class Services
         Hotkeys.Dictation = Settings.DictationCombo;
         Hotkeys.PasteLast = Settings.PasteLastCombo;
         Hotkeys.CopyLast = Settings.CopyLastCombo;
-        Bar.AlwaysVisible = Settings.ShowFlowBarAlways;
+        Bar.AlwaysVisible = Settings.ShowVoxBarAlways;
         Bar.SetState(Dictation.State, "");
         SetAutostart(Settings.LaunchAtLogin);
         if (modelChanged) _ = LoadModelAsync();
@@ -138,7 +138,7 @@ public partial class App : System.Windows.Application
         if (e.Args.Length >= 3 && e.Args[0] == "--loopback-test") { await MeetingTest.LoopbackAsync(e.Args); Shutdown(); return; }
         if (e.Args.Length >= 3 && e.Args[0] == "--spk-probe") { MeetingTest.Probe(e.Args); Shutdown(); return; }
         if (e.Args.Length >= 4 && e.Args[0] == "--meeting-test") { await MeetingTest.RunAsync(e.Args); Shutdown(); return; }
-        if (e.Args.Length >= 1 && e.Args[0] == "--demo-flowbar") { await DemoFlowBarAsync(); Shutdown(); return; }
+        if (e.Args.Length >= 1 && e.Args[0] == "--demo-bar") { await DemoVoxBarAsync(); Shutdown(); return; }
 
         // single instance: a second launch just brings up the first one
         // a test copy with its own settings folder (VOX_SETTINGS_DIR) may run beside the real Vox
@@ -177,7 +177,7 @@ public partial class App : System.Windows.Application
         if (problems.Count > 0)
             System.Windows.MessageBox.Show(string.Join("\n\n", problems), "Vox", MessageBoxButton.OK, MessageBoxImage.Warning);
 
-        s.Bar = new FlowBar { AlwaysVisible = s.Settings.ShowFlowBarAlways };
+        s.Bar = new VoxBar { AlwaysVisible = s.Settings.ShowVoxBarAlways };
         s.Dictation = new DictationController(s.Settings, s.Data, s.Engine);
         s.Meeting = new MeetingRecorder(s.Settings, s.Data, s.Engine);
         s.Hotkeys = new HotkeyService(System.Threading.SynchronizationContext.Current!) { Dictation = s.Settings.DictationCombo, PasteLast = s.Settings.PasteLastCombo, CopyLast = s.Settings.CopyLastCombo };
@@ -209,10 +209,10 @@ public partial class App : System.Windows.Application
         if (!s.Engine.IsLoaded && !background) ShowMain();
     }
 
-    /// <summary>Developer aid: cycles the Flow Bar through its states with synthetic levels (no mic, no model).</summary>
-    static async Task DemoFlowBarAsync()
+    /// <summary>Developer aid: cycles the Vox bar through its states with synthetic levels (no mic, no model).</summary>
+    static async Task DemoVoxBarAsync()
     {
-        var bar = new FlowBar { AlwaysVisible = true };
+        var bar = new VoxBar { AlwaysVisible = true };
         bar.Show(); bar.SetState(VoxState.Idle, "");
         await Task.Delay(4000);
         bar.SetState(VoxState.Listening, "Listening");

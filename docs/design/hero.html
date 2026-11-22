@@ -29,12 +29,12 @@
   .body{font-size:19px;line-height:1.6;margin-top:18px}
   .typed{background:linear-gradient(transparent 62%, rgba(14,124,134,.16) 62%)}
   .caret{display:inline-block;width:2px;height:22px;background:#0E7C86;vertical-align:-4px;margin-left:2px}
-  /* the Flow Bar */
-  .flow{position:absolute;right:186px;top:470px;height:52px;width:300px;border-radius:26px;background:rgba(23,26,32,.96);border:1px solid rgba(255,255,255,.22);box-shadow:0 12px 30px rgba(0,0,0,.5);display:flex;align-items:center;padding:0 22px;gap:14px;box-sizing:border-box}
+  /* the Vox bar */
+  .vbar{position:absolute;right:186px;top:470px;height:52px;width:300px;border-radius:26px;background:rgba(23,26,32,.96);border:1px solid rgba(255,255,255,.22);box-shadow:0 12px 30px rgba(0,0,0,.5);display:flex;align-items:center;padding:0 22px;gap:14px;box-sizing:border-box}
   .dot{width:11px;height:11px;border-radius:50%;background:#FF5A4F;box-shadow:0 0 12px rgba(255,90,79,.8)}
   .wave{display:flex;align-items:center;gap:3px;height:30px;flex:1}
   .wave i{display:block;width:4px;border-radius:2px;background:#F2F3F5;opacity:.9}
-  .flow span{font-size:16px;font-weight:600}
+  .vbar span{font-size:16px;font-weight:600}
   .note{position:absolute;right:186px;top:534px;width:300px;text-align:center;font-size:14px;color:#8B909B}
 </style></head>
 <body><div class="hero" id="cap">
@@ -57,7 +57,7 @@
       <div class="body">Hi Dana,<br><br><span class="typed">The new board passed thermal testing at 85°C with the 48 V input. I'll send the full report by 9:15 a.m. tomorrow.</span><span class="caret"></span></div>
     </div>
   </div>
-  <div class="flow"><div class="dot"></div><div class="wave" id="wave"></div><span>Listening</span></div>
+  <div class="vbar"><div class="dot"></div><div class="wave" id="wave"></div><span>Listening</span></div>
 </div>
 <script>
   const h=[6,10,16,24,14,28,20,12,26,30,18,9,22,27,15,8,19,25,11,6,14,9];

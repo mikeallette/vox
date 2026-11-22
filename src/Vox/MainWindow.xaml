@@ -135,7 +135,7 @@
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                 <StackPanel>
                     <TextBlock Text="Dictionary" Style="{StaticResource H1}"/>
-                    <TextBlock Style="{StaticResource Sub}" Text="Names, jargon and product terms. Fill only 'Write as' to teach Vox a word (it listens for it and fixes capitalization). Add 'Heard as' to correct a repeat mistake, e.g. heard 'clawed code' → write 'Claude Code'."/>
+                    <TextBlock Style="{StaticResource Sub}" Text="Names, jargon and product terms. Fill only 'Write as' to teach Vox a word (it listens for it and fixes capitalization). Add 'Heard as' to correct a repeat mistake, e.g. heard 'mos fet' → write 'MOSFET'."/>
                 </StackPanel>
                 <DataGrid x:Name="DictGrid" Grid.Row="1" Margin="0,16,0,0" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
                           HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource Line}" Background="White" BorderBrush="{StaticResource Line}"
@@ -239,7 +239,7 @@
                     <CheckBox x:Name="ChkFillers" Content="Remove filler sounds (um, uh, hmm)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkNumbers" Content="Write numbers and units like an engineer (48 V, 8 A, 250 kHz, 10 kΩ, 8:10 p.m.)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkCommands" Content="Spoken commands: say 'new line' or 'new paragraph'" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-                    <CheckBox x:Name="ChkFlowBar" Content="Show the Flow Bar at all times" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                    <CheckBox x:Name="ChkVoxBar" Content="Show the Vox bar at all times" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkLaunch" Content="Start Vox when I sign in to Windows" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkHistory" Content="Keep dictation history" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                     <CheckBox x:Name="ChkAudio" Content="Also keep the audio of each dictation (uses disk space)" Margin="0,3" Checked="Setting_Changed" Unchecked="Setting_Changed"/>

@@ -333,7 +333,7 @@ public partial class MainWindow : Window
         ChkFillers.IsChecked = S.Settings.RemoveFillers;
         ChkNumbers.IsChecked = S.Settings.FormatNumbers;
         ChkCommands.IsChecked = S.Settings.VoiceCommands;
-        ChkFlowBar.IsChecked = S.Settings.ShowFlowBarAlways;
+        ChkVoxBar.IsChecked = S.Settings.ShowVoxBarAlways;
         ChkLaunch.IsChecked = S.Settings.LaunchAtLogin;
         ChkHistory.IsChecked = S.Settings.SaveHistory;
         ChkAudio.IsChecked = S.Settings.KeepAudio;
@@ -396,7 +396,7 @@ public partial class MainWindow : Window
         s.RemoveFillers = ChkFillers.IsChecked == true;
         s.FormatNumbers = ChkNumbers.IsChecked == true;
         s.VoiceCommands = ChkCommands.IsChecked == true;
-        s.ShowFlowBarAlways = ChkFlowBar.IsChecked == true;
+        s.ShowVoxBarAlways = ChkVoxBar.IsChecked == true;
         s.LaunchAtLogin = ChkLaunch.IsChecked == true;
         s.SaveHistory = ChkHistory.IsChecked == true;
         s.KeepAudio = ChkAudio.IsChecked == true;

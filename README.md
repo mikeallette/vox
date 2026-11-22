@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/mikeallette/vox/releases/latest"><img alt="Download" src="https://img.shields.io/github/v/release/mikeallette/vox?label=download&color=0E7C86&style=for-the-badge"></a>
-  <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-1A1C21?style=for-the-badge&logo=windows&logoColor=white">
+  <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-1A1C21?style=for-the-badge">
   <img alt="Works offline" src="https://img.shields.io/badge/works-100%25%20offline-1A1C21?style=for-the-badge">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-1A1C21?style=for-the-badge"></a>
 </p>
@@ -32,7 +32,7 @@
 ## Download
 
 1. Open the [**latest release**](https://github.com/mikeallette/vox/releases/latest).
-2. Download **`Vox-Setup-1.0.0.exe`** and run it. It installs just for you, with no administrator rights needed.
+2. Download **`Vox-Setup-1.0.1.exe`** and run it. It installs just for you, with no administrator rights needed.
 3. Start Vox from the Start menu, pick a folder for your data, and hold **Ctrl + Win** to talk.
 
 | File | What it is |
@@ -65,7 +65,7 @@ about 1.5 GB of disk space, and roughly 2 GB of free memory. The .NET runtime is
 | Copy the last dictation | **Alt + Shift + X** |
 
 Every shortcut can be changed in **Settings > Shortcuts**: click *Change...*, press the keys you want, and let go.
-Any mix of Ctrl, Alt, Shift and Win works, with up to two other keys. A small **Flow Bar** at the bottom of the
+Any mix of Ctrl, Alt, Shift and Win works, with up to two other keys. A small **Vox bar** at the bottom of the
 screen shows when Vox is listening, and it follows the monitor you're working on.
 
 ## Features
@@ -174,4 +174,4 @@ The README images are made from `docs\design\*.html`. Screenshots come from a de
 Vox is [MIT licensed](LICENSE). The engines and models it ships keep their own licenses (MIT, Apache-2.0
 and CC BY 4.0). Details are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
-Vox is an independent project. It isn't affiliated with Wispr Flow, NVIDIA or Alibaba Qwen.
+Vox is an independent project. It isn't affiliated with or endorsed by NVIDIA, Alibaba (Qwen) or Microsoft.

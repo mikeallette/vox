@@ -13,7 +13,7 @@ public static class TextCleaner
     const string Fillers = @"(?:um+|uh+|uhm+|erm+|hmm+|mhm+|uh-huh)";
     static readonly Regex FillerAtSentenceStart = new($@"(^|[.!?]\s+){Fillers}\b[,.;]?\s*([a-z])", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     static readonly Regex FillerAnywhere = new($@"[ \t]*\b{Fillers}\b[,;]?(?=\s|$|[.!?])", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    // Spoken stumbles, as Wispr Flow tidies them (real recordings, 2026-11-09): "I I should", "on on my laptop" -> one word.
+    // Spoken stumbles a careful typist would tidy (real recordings, 2026-11-09): "I I should", "on on my laptop" -> one word.
     // Only small words people stumble on; "had had", "that that", "so so", "very very" are left alone.
     static readonly Regex RepeatWord = new(@"\b(\p{L}[\p{L}']{2,})(?:[,.]?[ \t]+\1\b)+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     static readonly HashSet<string> KeepRepeat = new(StringComparer.OrdinalIgnoreCase)

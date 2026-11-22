@@ -11,10 +11,10 @@ using Vox.Core;
 namespace Vox.UI;
 
 /// <summary>
-/// The small always-on-top pill (Wispr's "Flow Bar"): a tiny idle capsule that expands into a live
+/// The small always-on-top pill: a tiny idle capsule that expands into a live
 /// waveform while listening. Click-through and non-activating, so it never steals focus from the app you are typing in.
 /// </summary>
-public partial class FlowBar : Window
+public partial class VoxBar : Window
 {
     const int Bars = 28;
     readonly Rectangle[] _bars = new Rectangle[Bars];
@@ -26,7 +26,7 @@ public partial class FlowBar : Window
     int _frame;
     public bool AlwaysVisible { get; set; } = true;
 
-    public FlowBar()
+    public VoxBar()
     {
         InitializeComponent();
         for (int i = 0; i < Bars; i++)
@@ -55,8 +55,8 @@ public partial class FlowBar : Window
     readonly DispatcherTimer _follow = new() { Interval = TimeSpan.FromMilliseconds(400) };
 
     /// <summary>
-    /// Centers the bar at the bottom of the screen you are working on (the monitor of the active window), like Wispr
-    /// Flow does. Works in physical pixels so mixed-DPI monitors line up; WPF rescales the window when it lands on a
+    /// Centers the bar at the bottom of the screen you are working on (the monitor of the active window).
+    /// Works in physical pixels so mixed-DPI monitors line up; WPF rescales the window when it lands on a
     /// monitor with a different DPI, and DpiChanged calls this again to re-center it.
     /// </summary>
     void Reposition()
@@ -80,7 +80,7 @@ public partial class FlowBar : Window
             _monitor = mon;
             Native.SetWindowPos(h, IntPtr.Zero, x, y, 0, 0, Native.SWP_NOSIZE | Native.SWP_NOZORDER | Native.SWP_NOACTIVATE);
         }
-        catch (Exception ex) { Log.Error("flow bar position", ex); }
+        catch (Exception ex) { Log.Error("bar position", ex); }
     }
 
     /// <summary>Moves the bar when you switch to a window on another screen (checked a few times a second; cheap).</summary>
